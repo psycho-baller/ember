@@ -24,7 +24,7 @@ const HeroSection = () => {
         <div className="mb-8 animate-fade-in">
           <h1 className="text-5xl md:text-7xl font-display font-bold mb-6">
             Hey there,{" "}
-            <span className="bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-primary to-primary-glow bg-clip-text text-transparent">
               I'm Orbit
             </span>
           </h1>

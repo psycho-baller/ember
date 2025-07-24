@@ -60,7 +60,7 @@ const HowItWorksSection = () => {
               style={{ animationDelay: `${index * 0.2}s` }}
             >
               {/* Step Number */}
-              <div className={`w-16 h-16 rounded-full bg-gradient-to-r ${step.color} flex items-center justify-center mb-6 mx-auto group-hover:scale-110 transition-transform duration-300`}>
+              <div className={`w-16 h-16 rounded-full bg-linear-to-r ${step.color} flex items-center justify-center mb-6 mx-auto group-hover:scale-110 transition-transform duration-300`}>
                 <span className="text-2xl font-bold text-black">{step.number}</span>
               </div>
 
@@ -112,7 +112,7 @@ const HowItWorksSection = () => {
                   <div className="w-full space-y-4">
                     <div className="bg-background border border-border p-4 rounded-2xl">
                       <div className="flex items-center space-x-3 mb-3">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-r from-primary to-accent-custom"></div>
+                        <div className="w-8 h-8 rounded-full bg-linear-to-r from-primary to-accent-custom"></div>
                         <div className="text-sm font-medium text-foreground">Orbit</div>
                       </div>
                       <p className="text-sm text-foreground font-medium">{step.mockup.text}</p>

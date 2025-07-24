@@ -44,7 +44,7 @@ const GlassmorphismHeader = () => {
         }`}>
           <div className="flex items-center justify-between">
             {/* Logo */}
-            <div className="font-display font-bold text-xl bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            <div className="font-display font-bold text-xl bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
               Orbit
             </div>
 

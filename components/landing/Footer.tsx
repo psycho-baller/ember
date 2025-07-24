@@ -33,7 +33,7 @@ const Footer = () => {
       <div className="max-w-4xl mx-auto">
         <div className="glass-card rounded-3xl p-8">
           <div className="text-center">
-            <h3 className="text-xl font-display font-semibold mb-6 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            <h3 className="text-xl font-display font-semibold mb-6 bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
               Connect with Orbit
             </h3>
             

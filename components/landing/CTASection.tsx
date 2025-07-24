@@ -50,7 +50,7 @@ const CTASection = () => {
         <div className="glass-card p-12 rounded-3xl">
           <h2 className="text-4xl md:text-5xl font-display font-bold mb-6">
             Ready to find your{" "}
-            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
               perfect people
             </span>
             ?

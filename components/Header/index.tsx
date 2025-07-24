@@ -52,7 +52,7 @@ const Header: FC<Props> = (props) => {
     // <header
     //   className={`fixed left-0 top-0 w-full z-99999 py-7 ${
     //     stickyMenu
-    //       ? "bg-white dark:bg-black shadow !py-4 transition duration-100"
+    //       ? "bg-white dark:bg-black shadow py-4! transition duration-100"
     //       : ""
     //   }`}
     // >
@@ -85,17 +85,17 @@ const Header: FC<Props> = (props) => {
     //           <span className="block absolute w-full h-full">
     //             <span
     //               className={`block relative top-0 left-0 bg-black dark:bg-white rounded-sm w-0 h-0.5 my-1 ease-in-out duration-200 delay-[0] ${
-    //                 !navigationOpen ? "!w-full delay-300" : ""
+    //                 !navigationOpen ? "w-full! delay-300" : ""
     //               }`}
     //             ></span>
     //             <span
     //               className={`block relative top-0 left-0 bg-black dark:bg-white rounded-sm w-0 h-0.5 my-1 ease-in-out duration-200 delay-150 ${
-    //                 !navigationOpen ? "!w-full delay-400" : ""
+    //                 !navigationOpen ? "w-full! delay-400" : ""
     //               }`}
     //             ></span>
     //             <span
     //               className={`block relative top-0 left-0 bg-black dark:bg-white rounded-sm w-0 h-0.5 my-1 ease-in-out duration-200 delay-200 ${
-    //                 !navigationOpen ? "!w-full delay-500" : ""
+    //                 !navigationOpen ? "w-full! delay-500" : ""
     //               }`}
     //             ></span>
     //           </span>
@@ -120,7 +120,7 @@ const Header: FC<Props> = (props) => {
     //     <div
     //       className={`w-full lg:w-full h-0 lg:h-auto invisible lg:visible lg:flex items-center justify-between ${
     //         navigationOpen &&
-    //         "!visible bg-white dark:bg-blacksection shadow-solid-5 h-auto max-h-[400px] overflow-y-scroll rounded-md mt-4 p-7.5"
+    //         "visible! bg-white dark:bg-blacksection shadow-solid-5 h-auto max-h-[400px] overflow-y-scroll rounded-md mt-4 p-7.5"
     //       }`}
     //     >
     //       <nav>

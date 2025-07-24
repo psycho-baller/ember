@@ -6,7 +6,7 @@ const MissionSection = () => {
           <div className="space-y-6">
             <h2 className="text-4xl md:text-5xl font-display font-bold text-foreground">
               University is about{" "}
-              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              <span className="bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
                 finding your people
               </span>
             </h2>
@@ -27,7 +27,7 @@ const MissionSection = () => {
             <div className="glass-card p-8 rounded-3xl transform rotate-3 hover:rotate-0 transition-transform duration-500">
               <div className="space-y-4">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-primary to-primary-glow"></div>
+                  <div className="w-10 h-10 rounded-full bg-linear-to-r from-primary to-primary-glow"></div>
                   <div>
                     <div className="h-3 bg-muted rounded w-24"></div>
                     <div className="h-2 bg-muted/60 rounded w-16 mt-1"></div>
