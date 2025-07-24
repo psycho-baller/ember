@@ -1,18 +1,26 @@
-import Link from "next/link";
+"use client";
+import FloatingBlobs from "@/components/landing/FloatingBlobs";
+import HeroSection from "@/components/landing/HeroSection";
+import MissionSection from "@/components/landing/MissionSection";
+import HowItWorksSection from "@/components/landing/HowItWorksSection";
+import CTASection from "@/components/landing/CTASection";
+import GlassmorphismHeader from "@/components/landing/GlassmorphismHeader";
+import Footer from "@/components/landing/Footer";
 
-export default function Home() {
+const Index = () => {
   return (
-    <div className="row">
-      <div className="col-12">
-        <h1 className="header">Supabase Auth + Storage</h1>
-        <p>
-          Experience our Auth and Storage through a simple profile management example. Create a user
-          profile and upload an avatar image. Fast, simple, secure.
-        </p>
-      </div>
-      <div className="col-6 form-widget">
-        <Link href="/login">Auth page</Link>
-      </div>
+    <div className="min-h-screen overflow-x-hidden">
+      <FloatingBlobs />
+
+      <main className="relative z-10">
+        <HeroSection />
+        <MissionSection />
+        <HowItWorksSection />
+        <CTASection />
+        <Footer />
+      </main>
     </div>
-  )
-}
+  );
+};
+
+export default Index;
