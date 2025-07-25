@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-
+import { toast } from "sonner"
 interface AuthResponse {
   data: {
     user: {
@@ -16,7 +15,6 @@ interface AuthResponse {
 export const useEmailSignup = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [waitlistEmail, setWaitlistEmail] = useState<string | null>(null);
-  const { toast } = useToast();
   const supabase = createClient();
 
   // Check localStorage on initial load
@@ -60,8 +58,7 @@ export const useEmailSignup = () => {
           }
         }
 
-        toast({
-          title: "Check your email!",
+        toast("Check your email!", {
           description: `We've sent a magic link to ${email}. Click it to sign in.`,
         });
 
@@ -84,8 +81,7 @@ export const useEmailSignup = () => {
         localStorage.setItem('waitlistEmail', email);
         setWaitlistEmail(email);
 
-        toast({
-          title: "Thanks for your interest!",
+        toast("Thanks for your interest!", {
           description: "We've added you to our waitlist. We'll notify you when we expand to your university!",
         });
 
@@ -93,10 +89,8 @@ export const useEmailSignup = () => {
       }
     } catch (error: any) {
       console.error('Email signup error:', error);
-      toast({
-        title: "Error",
+      toast("Error", {
         description: error.message || "Failed to send magic link. Please try again.",
-        variant: "destructive",
       });
       return { success: false, error };
     } finally {
