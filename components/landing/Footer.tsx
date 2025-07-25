@@ -4,22 +4,22 @@ const Footer = () => {
   const socialLinks = [
     {
       name: "LinkedIn",
-      url: "https://linkedin.com",
+      url: "https://linkedin.com/in/rami-m",
       icon: Linkedin,
     },
     {
-      name: "Instagram", 
-      url: "https://instagram.com",
+      name: "Instagram",
+      url: "https://instagram.com/psycho.baller",
       icon: Instagram,
     },
     {
       name: "X (Twitter)",
-      url: "https://x.com",
+      url: "https://x.com/rami__maalouf",
       icon: Twitter,
     },
     {
       name: "Substack",
-      url: "https://substack.com",
+      url: "https://ramimaalouf.substack.com",
       icon: ({ className }: { className?: string }) => (
         <svg className={className} viewBox="0 0 24 24" fill="currentColor">
           <path d="M22.539 8.242H1.46V5.406h21.08v2.836zM1.46 10.812V24L12 18.11 22.539 24V10.812H1.46zM22.539 0H1.46v2.836h21.08V0z"/>
@@ -34,9 +34,9 @@ const Footer = () => {
         <div className="glass-card rounded-3xl p-8">
           <div className="text-center">
             <h3 className="text-xl font-display font-semibold mb-6 bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
-              Connect with Orbit
+              Connect with Ember
             </h3>
-            
+
             <div className="flex justify-center items-center space-x-6 mb-6">
               {socialLinks.map((link) => {
                 const IconComponent = link.icon;
@@ -54,9 +54,9 @@ const Footer = () => {
                 );
               })}
             </div>
-            
+
             <div className="text-sm text-foreground/60">
-              <p>&copy; 2024 Orbit. Connecting UCalgary students through AI.</p>
+              <p>&copy; 2025 Ember. Connecting UCalgary students through AI.</p>
             </div>
           </div>
         </div>

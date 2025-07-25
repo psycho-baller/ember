@@ -38,32 +38,32 @@ export const siteConfig = {
 export const headerRoutes = [
   {
     id: 1,
-    title: 'Home',
+    title: 'About',
     newTab: false,
     path: '/',
   },
   {
     id: 2,
-    title: 'Features',
+    title: 'Mission',
     newTab: false,
-    path: '/#features',
+    path: '#mission',
   },
   {
     id: 3,
-    title: 'Contact',
+    title: 'How i work',
     newTab: false,
-    path: '/contact',
+    path: '#how-i-work',
   },
   {
     id: 4,
-    title: 'GitHub',
+    title: 'Discord',
     newTab: true,
-    path: siteConfig.links.github,
+    path: siteConfig.links.discord,
   },
-  {
-    id: 5,
-    title: 'Support Us',
-    newTab: true,
-    path: siteConfig.links.kofi,
-  },
+  // {
+  //   id: 5,
+  //   title: 'Support Us',
+  //   newTab: true,
+  //   path: siteConfig.links.kofi,
+  // },
 ] as const

@@ -10,7 +10,7 @@ const steps = [
     mockup: {
       type: "chat",
       messages: [
-        { sender: "orbit", text: "Hey! I&apos;m Orbit 👋 Let&apos;s find your people! What brings you here today?" },
+        { sender: "ember", text: "Hey! I&apos;m Ember 👋 Let&apos;s find your people! What brings you here today?" },
         { sender: "user", text: "I&apos;m looking for a study partner for my CS classes..." }
       ]
     }
@@ -113,7 +113,7 @@ const HowItWorksSection = () => {
                     <div className="bg-background border border-border p-4 rounded-2xl">
                       <div className="flex items-center space-x-3 mb-3">
                         <div className="w-8 h-8 rounded-full bg-linear-to-r from-primary to-accent-custom"></div>
-                        <div className="text-sm font-medium text-foreground">Orbit</div>
+                        <div className="text-sm font-medium text-foreground">Ember</div>
                       </div>
                       <p className="text-sm text-foreground font-medium">{step.mockup.text}</p>
                     </div>

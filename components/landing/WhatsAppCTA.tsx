@@ -3,7 +3,7 @@ import { MessageCircle } from "lucide-react";
 const WhatsAppCTA = () => {
   const handleWhatsAppClick = () => {
     // Replace with actual WhatsApp number/link
-    const message = encodeURIComponent("Hey! I'm interested in Orbit at UCalgary 🚀");
+    const message = encodeURIComponent("Hey! I'm interested in Ember at UCalgary 🚀");
     const whatsappUrl = `https://wa.me/1234567890?text=${message}`;
     window.open(whatsappUrl, '_blank');
   };

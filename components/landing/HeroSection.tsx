@@ -51,16 +51,16 @@ const HeroSection = () => {
 
   return (
     <section id="hero" className="relative min-h-screen flex items-center justify-center px-4 overflow-hidden">
-      <div className="relative z-10 text-center max-w-4xl mx-auto">
+      <div className="relative z-10 text-center max-w-7xl mx-auto">
         <div className="mb-8 animate-fade-in">
-          <h1 className="text-5xl md:text-7xl font-display font-bold mb-6">
-            Hey there,{" "}
-            <span className="bg-linear-to-r from-primary to-primary-glow bg-clip-text text-transparent">
-              I&apos;m Orbit
+          <h1 className="text-4xl sm:text-5xl md:text-7xl 2xl:text-8xl font-display font-bold mb-1 sm:mb-2 md:mb-4">
+          I&apos;m Ember, your{" "}
+            <span className="bg-linear-to-r from-primary to-accent-custom bg-clip-text text-transparent">
+              university superconnector
             </span>
           </h1>
           <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Your friendly AI superconnector at the University of Calgary. I help you find exactly who you&apos;re looking for through a single warm intro.
+            I help you find exactly who you&apos;re looking for. A friend, a mentor, a hobby buddy, or even a life partner.
           </p>
         </div>
 

@@ -40,7 +40,7 @@ const Header: FC<ComponentPropsWithoutRef<"header">> = (props) => {
               }
             }}
           />
-          <ThemeToggler />
+          {/* <ThemeToggler /> */}
         </div>
       </div>
     </header>

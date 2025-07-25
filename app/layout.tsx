@@ -11,8 +11,8 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "Next.js and Supabase Starter Kit",
-  description: "The fastest way to build apps with Next.js and Supabase",
+  title: "Ember AI - Your AI uni superconnector",
+  description: "Your AI superconnector at the University of Calgary. I help you find exactly who you\'re looking for through a single warm intro.",
 };
 
 const geistSans = Geist({
@@ -33,7 +33,7 @@ export default function RootLayout({
         <Toaster />
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="dark"
           enableSystem
           // disableTransitionOnChange
         >
