@@ -1,5 +1,4 @@
 import { useTheme } from "next-themes";
-import Image from "next/image";
 import styles from "./Styles.module.css";
 import { cn } from "@/lib/utils";
 

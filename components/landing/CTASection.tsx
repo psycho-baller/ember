@@ -7,12 +7,11 @@ import { motion } from "framer-motion";
 const CTASection = () => {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!email.endsWith("@ucalgary.ca")) {
       toast({
         title: "Invalid Email",
@@ -23,8 +22,7 @@ const CTASection = () => {
     }
 
     setIsLoading(true);
-    setIsSubmitted(true);
-    
+
     try {
       // TODO: Connect to Supabase
       toast({
@@ -33,6 +31,7 @@ const CTASection = () => {
       });
       setEmail("");
     } catch (error) {
+      console.error(error);
       toast({
         title: "Something went wrong",
         description: "Please try again later.",
@@ -40,7 +39,6 @@ const CTASection = () => {
       });
     } finally {
       setIsLoading(false);
-      setIsSubmitted(false);
     }
   };
 
@@ -58,12 +56,10 @@ const CTASection = () => {
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
             Be the first to find your people on campus. Sign up with your @ucalgary.ca email.
           </p>
-          
-          <motion.form 
-            onSubmit={handleSubmit} 
+
+          <motion.form
+            onSubmit={handleSubmit}
             className="max-w-lg mx-auto"
-            animate={isSubmitted ? { scale: 0.98, opacity: 0.8 } : { scale: 1, opacity: 1 }}
-            transition={{ duration: 0.2 }}
           >
             <div className="flex items-center bg-background/50 backdrop-blur-xs rounded-full border border-border/50 p-1 max-w-md mx-auto">
               <Input

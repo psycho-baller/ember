@@ -1,17 +1,12 @@
 "use client";
-import { type FC, type ComponentPropsWithoutRef, useState, useEffect, useRef } from "react";
-import Image from "next/image";
-import Link from "next/link";
+import { type FC, type ComponentPropsWithoutRef, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { useScroll } from "framer-motion";
 
 import ThemeToggler from "./ThemeToggler";
 import Navigation from "./Navigation";
 import Logo from "../Logo";
 
-interface Props extends ComponentPropsWithoutRef<"header"> { }
-
-const Header: FC<Props> = (props) => {
+const Header: FC<ComponentPropsWithoutRef<"header">> = (props) => {
   const { ...rest } = props;
   const router = useRouter();
   const ref = useRef<HTMLHeadElement>(null);

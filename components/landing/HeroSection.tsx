@@ -25,11 +25,11 @@ const HeroSection = () => {
           <h1 className="text-5xl md:text-7xl font-display font-bold mb-6">
             Hey there,{" "}
             <span className="bg-linear-to-r from-primary to-primary-glow bg-clip-text text-transparent">
-              I'm Orbit
+              I&apos;m Orbit
             </span>
           </h1>
           <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Your friendly AI superconnector at the University of Calgary. I help you find exactly who you're looking for through a single warm intro.
+            Your friendly AI superconnector at the University of Calgary. I help you find exactly who you&apos;re looking for through a single warm intro.
           </p>
         </div>
 
@@ -59,7 +59,7 @@ const HeroSection = () => {
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground mt-4 text-center">
-                Enter your University email to get started. We'll send you a magic link to sign in.
+                Enter your University email to get started. We&#39;ll send you a magic link to sign in.
               </p>
             </form>
           </motion.div>
@@ -71,8 +71,8 @@ const HeroSection = () => {
             transition={{ duration: 0.5 }}
           >
             <div className="text-center">
-              <h3 className="text-lg font-medium mb-2">🎉 You're on the waitlist!</h3>
-              <p className="text-sm text-muted-foreground">We'll notify you at {waitlistEmail} when we expand to your university.</p>
+              <h3 className="text-lg font-medium mb-2">🎉 You&apos;re on the waitlist!</h3>
+              <p className="text-sm text-muted-foreground">We&apos;ll notify you at {waitlistEmail} when we expand to your university.</p>
             </div>
           </motion.div>
         )}

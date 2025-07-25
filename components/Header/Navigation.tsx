@@ -5,9 +5,11 @@ import NavLink from "./NavLink";
 import { headerRoutes } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 
-interface Props extends ComponentPropsWithoutRef<"nav"> { }
+interface NavigationProps extends ComponentPropsWithoutRef<"nav"> {
+  className?: string;
+}
 
-const Navigation = (props: Props) => {
+const Navigation = (props: NavigationProps) => {
   const { } = props;
   const pathname = usePathname();
 
@@ -49,6 +51,7 @@ const Navigation = (props: Props) => {
             href={path}
             isActive={pathname === path}
             isBelowHeader={isBelowHeader}
+            id={id?.toString()}
             {...props}
           >
             {props.title}

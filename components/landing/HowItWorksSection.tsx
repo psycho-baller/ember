@@ -4,21 +4,21 @@ const steps = [
   {
     number: "1",
     title: "We Chat & Get to Know Each Other",
-    description: "I'll ask about who you are, what you're into, and exactly who you're hoping to meet on campus.",
+    description: "I&apos;ll ask about who you are, what you&apos;re into, and exactly who you&apos;re hoping to meet on campus.",
     icon: MessageCircle,
     color: "from-primary to-primary-glow",
     mockup: {
       type: "chat",
       messages: [
-        { sender: "orbit", text: "Hey! I'm Orbit 👋 Let's find your people! What brings you here today?" },
-        { sender: "user", text: "I'm looking for a study partner for my CS classes..." }
+        { sender: "orbit", text: "Hey! I&apos;m Orbit 👋 Let&apos;s find your people! What brings you here today?" },
+        { sender: "user", text: "I&apos;m looking for a study partner for my CS classes..." }
       ]
     }
   },
   {
     number: "2",
     title: "I Create Your Perfect Profile",
-    description: "Based on our chat, I'll build a profile that captures who you are and who you're looking for.",
+    description: "Based on our chat, I&apos;ll build a profile that captures who you are and who you&apos;re looking for.",
     icon: Brain,
     color: "from-accent-custom to-accent-glow",
     mockup: {
@@ -48,7 +48,7 @@ const HowItWorksSection = () => {
             How I Work
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            It's effortless, useful, and exciting—not salesy. Here's how we'll find your people:
+            It&apos;s effortless, useful, and exciting—not salesy. Here&apos;s how we&apos;ll find your people:
           </p>
         </div>
 

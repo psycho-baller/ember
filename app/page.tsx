@@ -4,7 +4,6 @@ import HeroSection from "@/components/landing/HeroSection";
 import MissionSection from "@/components/landing/MissionSection";
 import HowItWorksSection from "@/components/landing/HowItWorksSection";
 import CTASection from "@/components/landing/CTASection";
-import GlassmorphismHeader from "@/components/landing/GlassmorphismHeader";
 import Footer from "@/components/landing/Footer";
 
 const Index = () => {
