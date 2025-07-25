@@ -1,14 +1,12 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import { useEmailSignup } from "@/hooks/use-email-signup";
 
 const CTASection = () => {
   const [email, setEmail] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const { toast } = useToast();
   const { signUpWithEmail, isLoading, waitlistEmail } = useEmailSignup();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -70,8 +68,8 @@ const CTASection = () => {
               transition={{ duration: 0.5 }}
             >
               <div className="glass-card p-6 rounded-2xl max-w-md mx-auto">
-                <h3 className="text-lg font-medium mb-2">🎉 You're on the waitlist!</h3>
-                <p className="text-sm text-muted-foreground">We'll notify you at {waitlistEmail} when we expand to your university.</p>
+                <h3 className="text-lg font-medium mb-2">🎉 You&rsquo;re on the waitlist!</h3>
+                <p className="text-sm text-muted-foreground">We&rsquo;ll notify you at {waitlistEmail} when we expand to your university.</p>
               </div>
             </motion.div>
           )}
