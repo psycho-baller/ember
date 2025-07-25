@@ -3,19 +3,39 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
 import { useEmailSignup } from "@/hooks/use-email-signup";
+import { isValidUniversityEmail, getEmailValidationError } from "@/lib/email-utils";
 
 const CTASection = () => {
   const [email, setEmail] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { signUpWithEmail, isLoading, waitlistEmail } = useEmailSignup();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
-
-    setIsSubmitted(true);
-    await signUpWithEmail(email);
-    setIsSubmitted(false);
+    setError(null);
+    
+    // Basic validation
+    if (!email) {
+      setError('Please enter an email address');
+      return;
+    }
+    
+    // Check if it's a valid university email
+    if (!isValidUniversityEmail(email)) {
+      const errorMessage = getEmailValidationError(email);
+      setError(errorMessage);
+      return;
+    }
+    
+    try {
+      setIsSubmitted(true);
+      await signUpWithEmail(email);
+    } catch (err) {
+      setError('Failed to process your request. Please try again.');
+    } finally {
+      setIsSubmitted(false);
+    }
   };
 
   return (
@@ -42,23 +62,34 @@ const CTASection = () => {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.5 }}
             >
-              <div className="flex items-center bg-background/50 backdrop-blur-xs rounded-full border border-border/50 p-1 max-w-md mx-auto">
-                <Input
-                  type="email"
-                  placeholder="your@university.edu"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="flex-1 border-0 bg-transparent text-sm px-4 py-2 focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground/60"
-                  required
-                />
-                <Button
-                  type="submit"
-                  disabled={isLoading || isSubmitted}
-                  size="sm"
-                  className="rounded-full px-6 py-2 text-sm font-medium bg-primary hover:bg-primary/90 text-primary-foreground"
-                >
-                  {isLoading || isSubmitted ? "..." : "Join"}
-                </Button>
+              <div className="space-y-2">
+                <div className="flex items-center bg-background/50 backdrop-blur-xs rounded-full border border-border/50 p-1 max-w-md mx-auto">
+                  <Input
+                    type="email"
+                    placeholder="your@university.edu"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      // Clear error when user types
+                      if (error) setError(null);
+                    }}
+                    className="flex-1 border-0 bg-transparent text-sm px-4 py-2 focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground/60"
+                    required
+                  />
+                  <Button
+                    type="submit"
+                    disabled={isLoading || isSubmitted}
+                    size="sm"
+                    className="rounded-full px-6 py-2 text-sm font-medium bg-primary hover:bg-primary/90 text-primary-foreground"
+                  >
+                    {isLoading || isSubmitted ? "Sending..." : "Join"}
+                  </Button>
+                </div>
+                {error && (
+                  <p className="text-xs text-red-500 px-4">
+                    {error}
+                  </p>
+                )}
               </div>
             </motion.form>
           ) : (
