@@ -65,7 +65,7 @@ const CTASection = () => {
             animate={isSubmitted ? { scale: 0.98, opacity: 0.8 } : { scale: 1, opacity: 1 }}
             transition={{ duration: 0.2 }}
           >
-            <div className="flex items-center bg-background/50 backdrop-blur-sm rounded-full border border-border/50 p-1 max-w-md mx-auto">
+            <div className="flex items-center bg-background/50 backdrop-blur-xs rounded-full border border-border/50 p-1 max-w-md mx-auto">
               <Input
                 type="email"
                 placeholder="your@ucalgary.ca"

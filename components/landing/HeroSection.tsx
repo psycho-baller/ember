@@ -40,7 +40,7 @@ const HeroSection = () => {
             transition={{ duration: 0.2 }}
           >
             <form onSubmit={handleEmailSubmit} className="space-y-4">
-              <div className="flex items-center bg-background/50 backdrop-blur-sm rounded-full border border-border/50 p-1">
+              <div className="flex items-center bg-background/50 backdrop-blur-xs rounded-full border border-border/50 p-1">
                 <Input
                   type="email"
                   placeholder="your@university.edu"

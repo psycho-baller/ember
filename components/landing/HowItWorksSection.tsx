@@ -65,7 +65,7 @@ const HowItWorksSection = () => {
               </div>
 
               {/* Mockup */}
-              <div className="mb-6 bg-background/80 border border-border rounded-2xl p-4 backdrop-blur-sm min-h-[200px] flex items-center justify-center">
+              <div className="mb-6 bg-background/80 border border-border rounded-2xl p-4 backdrop-blur-xs min-h-[200px] flex items-center justify-center">
                 {step.mockup.type === "chat" && (
                   <div className="space-y-3 w-full">
                     {step.mockup.messages?.map((message, i) => (

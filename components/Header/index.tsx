@@ -52,7 +52,7 @@ const Header: FC<Props> = (props) => {
     // <header
     //   className={`fixed left-0 top-0 w-full z-99999 py-7 ${
     //     stickyMenu
-    //       ? "bg-white dark:bg-black shadow py-4! transition duration-100"
+    //       ? "bg-white dark:bg-black shadow-sm py-4! transition duration-100"
     //       : ""
     //   }`}
     // >

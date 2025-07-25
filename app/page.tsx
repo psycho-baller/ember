@@ -8,6 +8,7 @@ import GlassmorphismHeader from "@/components/landing/GlassmorphismHeader";
 import Footer from "@/components/landing/Footer";
 
 const Index = () => {
+
   return (
     <div className="min-h-screen overflow-x-hidden">
       <FloatingBlobs />
