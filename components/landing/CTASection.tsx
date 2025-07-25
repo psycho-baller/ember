@@ -3,43 +3,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
+import { useEmailSignup } from "@/hooks/use-email-signup";
 
 const CTASection = () => {
   const [email, setEmail] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const { toast } = useToast();
+  const { signUpWithEmail, isLoading, waitlistEmail } = useEmailSignup();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email) return;
 
-    if (!email.endsWith("@ucalgary.ca")) {
-      toast({
-        title: "Invalid Email",
-        description: "Please use your @ucalgary.ca email address.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsLoading(true);
-
-    try {
-      // TODO: Connect to Supabase
-      toast({
-        title: "Welcome to Orbit! 🚀",
-        description: "You're on the waitlist. We'll send you an email soon!",
-      });
-      setEmail("");
-    } catch (error) {
-      console.error(error);
-      toast({
-        title: "Something went wrong",
-        description: "Please try again later.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    setIsSubmitted(true);
+    await signUpWithEmail(email);
+    setIsSubmitted(false);
   };
 
   return (
@@ -54,32 +32,49 @@ const CTASection = () => {
             ?
           </h2>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Be the first to find your people on campus. Sign up with your @ucalgary.ca email.
+            Be the first to find your people on campus. Sign up with your university email.
           </p>
 
-          <motion.form
-            onSubmit={handleSubmit}
-            className="max-w-lg mx-auto"
-          >
-            <div className="flex items-center bg-background/50 backdrop-blur-xs rounded-full border border-border/50 p-1 max-w-md mx-auto">
-              <Input
-                type="email"
-                placeholder="your@ucalgary.ca"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="flex-1 border-0 bg-transparent text-sm px-4 py-2 focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground/60"
-                required
-              />
-              <Button
-                type="submit"
-                disabled={isLoading}
-                size="sm"
-                className="rounded-full px-6 py-2 text-sm font-medium bg-primary hover:bg-primary/90 text-primary-foreground"
-              >
-                {isLoading ? "..." : "Join"}
-              </Button>
-            </div>
-          </motion.form>
+          {!waitlistEmail ? (
+            <motion.form
+              onSubmit={handleSubmit}
+              className="max-w-lg mx-auto"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+            >
+              <div className="flex items-center bg-background/50 backdrop-blur-xs rounded-full border border-border/50 p-1 max-w-md mx-auto">
+                <Input
+                  type="email"
+                  placeholder="your@university.edu"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="flex-1 border-0 bg-transparent text-sm px-4 py-2 focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground/60"
+                  required
+                />
+                <Button
+                  type="submit"
+                  disabled={isLoading || isSubmitted}
+                  size="sm"
+                  className="rounded-full px-6 py-2 text-sm font-medium bg-primary hover:bg-primary/90 text-primary-foreground"
+                >
+                  {isLoading || isSubmitted ? "..." : "Join"}
+                </Button>
+              </div>
+            </motion.form>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <div className="glass-card p-6 rounded-2xl max-w-md mx-auto">
+                <h3 className="text-lg font-medium mb-2">🎉 You're on the waitlist!</h3>
+                <p className="text-sm text-muted-foreground">We'll notify you at {waitlistEmail} when we expand to your university.</p>
+              </div>
+            </motion.div>
+          )}
 
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-6 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
@@ -88,11 +83,11 @@ const CTASection = () => {
             </div>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-              UCalgary students only
+              University students only
             </div>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
-              Launching Fall 2024
+              Launching Fall 2025
             </div>
           </div>
         </div>
