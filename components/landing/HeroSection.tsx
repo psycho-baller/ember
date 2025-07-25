@@ -3,19 +3,50 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useEmailSignup } from "@/hooks/use-email-signup";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
+import { isValidUniversityEmail, getEmailValidationError } from "@/lib/email-utils";
 
 const HeroSection = () => {
   const [email, setEmail] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { signUpWithEmail, isLoading, waitlistEmail } = useEmailSignup();
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
+    setError(null);
 
-    setIsSubmitted(true);
-    await signUpWithEmail(email);
-    setIsSubmitted(false);
+    // Basic validation
+    if (!email) {
+      setError('Please enter an email address');
+      return;
+    }
+
+    // Check if it's a valid university email
+    if (!isValidUniversityEmail(email)) {
+      const errorMessage = getEmailValidationError(email);
+      setError(errorMessage);
+
+      // // Show toast for non-university emails
+      // toast.error('University Email Required', {
+      //   description: 'Please use a valid US or Canadian university email address to join the waitlist.',
+      //   duration: 5000,
+      // });
+      return;
+    }
+
+    try {
+      setIsSubmitted(true);
+      await signUpWithEmail(email);
+    } catch (err) {
+      setError('Failed to process your request. Please try again.');
+      // toast.error('Error', {
+      //   description: 'Failed to process your request. Please try again.',
+      //   duration: 5000,
+      // });
+    } finally {
+      setIsSubmitted(false);
+    }
   };
 
   return (
@@ -40,31 +71,42 @@ const HeroSection = () => {
             transition={{ duration: 0.2 }}
           >
             <form onSubmit={handleEmailSubmit} className="space-y-4">
-              <div className="flex items-center bg-background/50 backdrop-blur-xs rounded-full border border-border/50 p-1">
-                <Input
-                  type="email"
-                  placeholder="your@university.edu"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="flex-1 border-0 bg-transparent text-sm px-4 py-2 focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground/60"
-                  required
-                />
-                <Button
-                  type="submit"
-                  disabled={isLoading}
-                  size="sm"
-                  className="rounded-full px-6 py-2 text-sm font-medium bg-primary hover:bg-primary/90 text-primary-foreground"
-                >
-                  {isLoading ? "Sending..." : "Join"}
-                </Button>
+              <div className="space-y-2">
+                <div className="flex items-center bg-background/50 backdrop-blur-xs rounded-full border border-border/50 p-1">
+                  <Input
+                    type="email"
+                    placeholder="your@university.edu"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      // Clear error when user types
+                      if (error) setError(null);
+                    }}
+                    className="flex-1 border-0 bg-transparent text-sm px-4 py-2 focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground/60"
+                    required
+                  />
+                  <Button
+                    type="submit"
+                    disabled={isLoading || isSubmitted}
+                    size="sm"
+                    className="rounded-full px-6 py-2 text-sm font-medium bg-primary hover:bg-primary/90 text-primary-foreground"
+                  >
+                    {isLoading || isSubmitted ? "Sending..." : "Join"}
+                  </Button>
+                </div>
+                {error && (
+                  <p className="text-xs text-red-500 px-4">
+                    {error}
+                  </p>
+                )}
               </div>
-              <p className="text-xs text-muted-foreground mt-4 text-center">
-                Enter your University email to get started. We&#39;ll send you a magic link to sign in.
+              <p className="text-xs text-muted-foreground mt-2 text-center">
+                Enter your US or Canadian university email to get started.
               </p>
             </form>
           </motion.div>
         ) : (
-          <motion.div 
+          <motion.div
             className="glass-card p-6 rounded-3xl max-w-md mx-auto mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

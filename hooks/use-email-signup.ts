@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { toast } from "sonner"
+import { toast } from "sonner";
+import { isValidUniversityEmail, getEmailValidationError } from '@/lib/email-utils';
 interface AuthResponse {
   data: {
     user: {
@@ -26,6 +27,11 @@ export const useEmailSignup = () => {
   const signUpWithEmail = async (email: string) => {
     setIsLoading(true);
     try {
+      // Validate university email
+      if (!isValidUniversityEmail(email)) {
+        throw new Error(getEmailValidationError(email) || 'Invalid university email');
+      }
+
       const isUCalgaryEmail = email.endsWith('@ucalgary.ca');
 
       if (isUCalgaryEmail) {
@@ -76,6 +82,8 @@ export const useEmailSignup = () => {
         if (waitlistError) {
           throw new Error('Failed to add to waitlist. Please try again.');
         }
+
+        console.log('Added to waitlist:', email);
 
         // Store the email in localStorage
         localStorage.setItem('waitlistEmail', email);
