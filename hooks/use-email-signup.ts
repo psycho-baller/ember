@@ -28,18 +28,18 @@ export const useEmailSignup = () => {
     setIsLoading(true);
     try {
       // Validate university email
-      // if (!isValidUniversityEmail(email)) {
-      //   throw new Error(getEmailValidationError(email) || 'Invalid university email');
-      // }
+      if (!isValidUniversityEmail(email)) {
+        throw new Error(getEmailValidationError(email) || 'Invalid university email');
+      }
 
-      // const isUCalgaryEmail = email.endsWith('@ucalgary.ca');
+      const isUCalgaryEmail = email.endsWith('@ucalgary.ca');
 
-      if (true) {
+      if (isUCalgaryEmail) {
         // For UCalgary emails, send magic link for passwordless sign in
         const { data, error } = await supabase.auth.signInWithOtp({
           email,
           options: {
-            emailRedirectTo: `${window.location.origin}/dashboard`,
+            emailRedirectTo: `${window.location.origin}/auth/callback?redirect=/dashboard`,
             shouldCreateUser: true,
           },
         }) as unknown as AuthResponse;
