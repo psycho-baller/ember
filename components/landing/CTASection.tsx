@@ -1,15 +1,29 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
 import { useEmailSignup } from "@/hooks/use-email-signup";
 import { isValidUniversityEmail, getEmailValidationError } from "@/lib/email-utils";
+import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
 
 const CTASection = () => {
   const [email, setEmail] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { signUpWithEmail, isLoading, waitlistEmail } = useEmailSignup();
+  const router = useRouter();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsLoggedIn(!!session);
+    };
+    
+    checkAuth();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,7 +67,15 @@ const CTASection = () => {
             Be the first to find your people on campus. Sign up with your university email.
           </p>
 
-          {!waitlistEmail ? (
+          {isLoggedIn ? (
+            <Button 
+              onClick={() => router.push('/profile')}
+              size="lg"
+              className="rounded-full px-8 py-6 text-base font-medium bg-primary hover:bg-primary/90 text-primary-foreground"
+            >
+              Go to Profile
+            </Button>
+          ) : !waitlistEmail ? (
             <motion.form
               onSubmit={handleSubmit}
               className="max-w-lg mx-auto"
