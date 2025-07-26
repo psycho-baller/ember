@@ -74,13 +74,13 @@ export const headerRoutes = [
     id: 2,
     title: 'Mission',
     newTab: false,
-    path: '#mission',
+    path: '/#mission',
   },
   {
     id: 3,
     title: 'How i work',
     newTab: false,
-    path: '#how-i-work',
+    path: '/#how-i-work',
   },
   {
     id: 4,
