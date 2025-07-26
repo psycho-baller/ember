@@ -24,7 +24,7 @@ const Header: FC<ComponentPropsWithoutRef<"header">> = (props) => {
 
       <div className="container mx-auto px-8 pt-8 z-50">
         <div className="lg:flex items-center justify-between hidden">
-          <Logo
+          {/* <Logo
             width={119.03}
             height={30}
             className="cursor-pointer"
@@ -39,7 +39,7 @@ const Header: FC<ComponentPropsWithoutRef<"header">> = (props) => {
                 router.push("/");
               }
             }}
-          />
+          /> */}
           {/* <ThemeToggler /> */}
         </div>
       </div>
