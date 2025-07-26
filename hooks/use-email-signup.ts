@@ -28,13 +28,13 @@ export const useEmailSignup = () => {
     setIsLoading(true);
     try {
       // Validate university email
-      if (!isValidUniversityEmail(email)) {
-        throw new Error(getEmailValidationError(email) || 'Invalid university email');
-      }
+      // if (!isValidUniversityEmail(email)) {
+      //   throw new Error(getEmailValidationError(email) || 'Invalid university email');
+      // }
 
-      const isUCalgaryEmail = email.endsWith('@ucalgary.ca');
+      // const isUCalgaryEmail = email.endsWith('@ucalgary.ca');
 
-      if (isUCalgaryEmail) {
+      if (true) {
         // For UCalgary emails, send magic link for passwordless sign in
         const { data, error } = await supabase.auth.signInWithOtp({
           email,
@@ -43,26 +43,9 @@ export const useEmailSignup = () => {
             shouldCreateUser: true,
           },
         }) as unknown as AuthResponse;
+        console.log(data, error);
 
         if (error) throw error;
-
-        // Add to users table
-        if (data?.user) {
-          const { error: userError } = await supabase
-            .from('profiles')
-            .upsert(
-              {
-                id: data.user.id,
-                email,
-                email_verified: false,
-              },
-              { onConflict: 'email' }
-            );
-
-          if (userError) {
-            console.error('User error:', userError);
-          }
-        }
 
         toast("Check your email!", {
           description: `We've sent a magic link to ${email}. Click it to sign in.`,
@@ -124,4 +107,4 @@ export const useEmailSignup = () => {
     isLoading,
     waitlistEmail
   };
-};
+}

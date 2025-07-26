@@ -23,17 +23,17 @@ const HeroSection = () => {
     }
 
     // Check if it's a valid university email
-    if (!isValidUniversityEmail(email)) {
-      const errorMessage = getEmailValidationError(email);
-      setError(errorMessage);
+    // if (!isValidUniversityEmail(email)) {
+    //   const errorMessage = getEmailValidationError(email);
+    //   setError(errorMessage);
 
-      // // Show toast for non-university emails
-      // toast.error('University Email Required', {
-      //   description: 'Please use a valid US or Canadian university email address to join the waitlist.',
-      //   duration: 5000,
-      // });
-      return;
-    }
+    //   // // Show toast for non-university emails
+    //   // toast.error('University Email Required', {
+    //   //   description: 'Please use a valid US or Canadian university email address to join the waitlist.',
+    //   //   duration: 5000,
+    //   // });
+    //   return;
+    // }
 
     try {
       setIsSubmitted(true);
