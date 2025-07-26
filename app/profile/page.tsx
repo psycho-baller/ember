@@ -32,7 +32,6 @@ export default async function ProfilePage() {
     .single();
 
   const hasPhoneNumber = !!profile?.phone_number;
-  const vapi_phone_number = "+1234567890"; // Your support number
 
   return (
     <div className="w-full max-w-md px-4">
@@ -44,14 +43,14 @@ export default async function ProfilePage() {
         {hasPhoneNumber ? (
           <>
             <p className="text-muted-foreground mb-8">
-              Call us at: <span className="font-mono">{vapi_phone_number}</span>
+              Call us at: <span className="font-mono">{process.env.VAPI_PHONE_NUMBER}</span>
             </p>
             <div className="flex justify-center">
               <PhoneButton
-                phoneNumber={vapi_phone_number}
+                phoneNumber={process.env.VAPI_PHONE_NUMBER!}
                 className="text-lg py-6 px-8 w-full max-w-xs"
               >
-                Call Support
+                Call Ember
               </PhoneButton>
             </div>
           </>
