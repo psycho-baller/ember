@@ -37,7 +37,7 @@ export default async function ProfilePage() {
     <div className="w-full max-w-md px-4">
       <div className="text-center">
         <h1 className="text-3xl font-bold mb-6">
-          {hasPhoneNumber ? "Ready to call Ember?" : "Add Your Phone Number"}
+          Ready to find your people?
         </h1>
 
         {hasPhoneNumber ? (
@@ -57,7 +57,7 @@ export default async function ProfilePage() {
         ) : (
           <div className="text-left">
             <p className="text-muted-foreground mb-6">
-              To get started, please provide your US or Canadian phone number. We'll use this to connect you with potential matches.
+              I'm excited to get to know you more! Just drop your phone number and I'll call you back as soon as possible
             </p>
             <PhoneNumberForm />
           </div>
