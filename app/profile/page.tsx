@@ -1,19 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import dynamic from "next/dynamic";
 import PhoneNumberForm from "@/components/phone-number-form";
 import PhoneButton from "@/components/secondary-button-link/phone-button";
-
-// Dynamically import the client component to avoid SSR issues
-// const PhoneNumberForm = dynamic(
-//   () => import("@/components/phone-number-form"),
-//   { ssr: false }
-// );
-
-// const PhoneButton = dynamic(
-//   () => import("@/components/secondary-button-link/phone-button"),
-//   { ssr: false }
-// );
 
 export default async function ProfilePage() {
   const supabase = await createClient();

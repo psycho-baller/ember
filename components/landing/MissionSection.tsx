@@ -6,7 +6,7 @@ const MissionSection = () => {
           <div className="space-y-6">
             <h2 className="text-4xl md:text-5xl font-display font-bold text-foreground">
               University is about{" "}
-              <span className="bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
+              <span className="bg-linear-to-r from-primary to-accent-custom bg-clip-text text-transparent">
                 finding your people
               </span>
             </h2>

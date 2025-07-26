@@ -21,27 +21,27 @@ const CTASection = () => {
       const { data: { session } } = await supabase.auth.getSession();
       setIsLoggedIn(!!session);
     };
-    
+
     checkAuth();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    
+
     // Basic validation
     if (!email) {
       setError('Please enter an email address');
       return;
     }
-    
+
     // Check if it's a valid university email
     if (!isValidUniversityEmail(email)) {
       const errorMessage = getEmailValidationError(email);
       setError(errorMessage);
       return;
     }
-    
+
     try {
       setIsSubmitted(true);
       await signUpWithEmail(email);
@@ -58,7 +58,7 @@ const CTASection = () => {
         <div className="glass-card p-12 rounded-3xl">
           <h2 className="text-4xl md:text-5xl font-display font-bold mb-6">
             Ready to find your{" "}
-            <span className="bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-primary to-accent-custom bg-clip-text text-transparent">
               perfect people
             </span>
             ?
@@ -68,7 +68,7 @@ const CTASection = () => {
           </p>
 
           {isLoggedIn ? (
-            <Button 
+            <Button
               onClick={() => router.push('/profile')}
               size="lg"
               className="rounded-full px-8 py-6 text-base font-medium bg-primary hover:bg-primary/90 text-primary-foreground"
