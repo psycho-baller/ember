@@ -45,7 +45,7 @@ export default async function ProfilePage() {
         ) : (
           <div className="text-left">
             <p className="text-muted-foreground mb-6">
-              I'm excited to get to know you more! Just drop your phone number and I'll call you back as soon as possible
+              I&apos;m excited to get to know you more! Just drop your phone number and I&apos;ll call you back as soon as possible
             </p>
             <PhoneNumberForm />
           </div>

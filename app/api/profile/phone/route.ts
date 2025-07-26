@@ -67,7 +67,7 @@ export async function POST(request: Request) {
     const { data, error } = await supabase
       .from("calls")
       .upsert({
-        // @ts-ignore
+        // @ts-expect-error - Type will be handled by the database
         vapi_call_id: response.id,
         user_id: user.id,
       }, { onConflict: "vapi_call_id" })
