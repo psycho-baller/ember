@@ -3,22 +3,22 @@ import { MessageCircle, Brain, Users } from "lucide-react";
 const steps = [
   {
     number: "1",
-    title: "We Chat & Get to Know Each Other",
-    description: "I'll ask about who you are, what you're into, and exactly who you're hoping to meet on campus.",
+    title: "We Chat or Call & Get to Know Each Other",
+    description: "I'll Learn about your interests and what excites you in life. I'll then ask about who you're hoping to meet on campus.",
     icon: MessageCircle,
     color: "from-primary to-primary-glow",
     mockup: {
       type: "chat",
       messages: [
-        { sender: "ember", text: "Hey! I'm Ember 👋 Let's find your people! What brings you here today?" },
-        { sender: "user", text: "I'm looking for a study partner for my CS classes..." }
+        { sender: "user", text: "I'm looking for someone in my Sociology class who would be interested in playing basketball after class" },
+        { sender: "ember", text: "I think I know just the person for you!" },
       ]
     }
   },
   {
     number: "2",
     title: "I Create Your Perfect Profile",
-    description: "Based on our chat, I'll build a profile that captures who you are and who you're looking for.",
+    description: "Based on our conversations, I'll build a profile that captures who you really are and who you're looking for.",
     icon: Brain,
     color: "from-accent-custom to-accent-glow",
     mockup: {
@@ -118,7 +118,7 @@ const HowItWorksSection = () => {
                       <p className="text-sm text-foreground font-medium">{step.mockup.text}</p>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
-                      <button className="bg-primary text-white px-4 py-2 rounded-full text-xs">
+                      <button className="bg-primary text-primary-foreground px-4 py-2 rounded-full text-xs">
                         ✓ Accept
                       </button>
                       <button className="bg-background border border-border text-foreground px-4 py-2 rounded-full text-xs">

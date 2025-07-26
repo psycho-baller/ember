@@ -127,7 +127,7 @@ const CTASection = () => {
             </motion.div>
           )}
 
-          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-6 text-sm text-muted-foreground">
+          {/* <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-6 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 bg-green-500 rounded-full"></span>
               Free to join
@@ -140,7 +140,7 @@ const CTASection = () => {
               <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
               Launching Fall 2025
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </section>
