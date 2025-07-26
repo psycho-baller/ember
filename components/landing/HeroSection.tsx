@@ -1,16 +1,30 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useEmailSignup } from "@/hooks/use-email-signup";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { isValidUniversityEmail, getEmailValidationError } from "@/lib/email-utils";
+import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
 
 const HeroSection = () => {
   const [email, setEmail] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { signUpWithEmail, isLoading, waitlistEmail } = useEmailSignup();
+  const router = useRouter();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsLoggedIn(!!session);
+    };
+    
+    checkAuth();
+  }, []);
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,10 +49,6 @@ const HeroSection = () => {
       await signUpWithEmail(email);
     } catch (err) {
       setError('Failed to process your request. Please try again.');
-      // toast.error('Error', {
-      //   description: 'Failed to process your request. Please try again.',
-      //   duration: 5000,
-      // });
     } finally {
       setIsSubmitted(false);
     }
@@ -59,7 +69,15 @@ const HeroSection = () => {
           </p>
         </div>
 
-        {!waitlistEmail ? (
+        {isLoggedIn ? (
+          <Button 
+            onClick={() => router.push('/profile')}
+            size="lg"
+            className="rounded-full px-8 py-6 text-base font-medium bg-primary hover:bg-primary/90 text-primary-foreground"
+          >
+            Go to Profile
+          </Button>
+        ) : !waitlistEmail ? (
           <motion.div
             className="glass-card p-6 rounded-3xl max-w-md mx-auto mb-8"
             animate={isSubmitted ? { scale: 0.98, opacity: 0.8 } : { scale: 1, opacity: 1 }}
