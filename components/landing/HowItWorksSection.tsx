@@ -4,21 +4,21 @@ const steps = [
   {
     number: "1",
     title: "We Chat & Get to Know Each Other",
-    description: "I&apos;ll ask about who you are, what you&apos;re into, and exactly who you&apos;re hoping to meet on campus.",
+    description: "I'll ask about who you are, what you're into, and exactly who you're hoping to meet on campus.",
     icon: MessageCircle,
     color: "from-primary to-primary-glow",
     mockup: {
       type: "chat",
       messages: [
-        { sender: "ember", text: "Hey! I&apos;m Ember 👋 Let&apos;s find your people! What brings you here today?" },
-        { sender: "user", text: "I&apos;m looking for a study partner for my CS classes..." }
+        { sender: "ember", text: "Hey! I'm Ember 👋 Let's find your people! What brings you here today?" },
+        { sender: "user", text: "I'm looking for a study partner for my CS classes..." }
       ]
     }
   },
   {
     number: "2",
     title: "I Create Your Perfect Profile",
-    description: "Based on our chat, I&apos;ll build a profile that captures who you are and who you&apos;re looking for.",
+    description: "Based on our chat, I'll build a profile that captures who you are and who you're looking for.",
     icon: Brain,
     color: "from-accent-custom to-accent-glow",
     mockup: {
@@ -41,7 +41,7 @@ const steps = [
 
 const HowItWorksSection = () => {
   return (
-    <section id="how-it-works" className="relative py-24 px-4">
+    <section id="how-i-work" className="relative py-24 px-4">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-display font-bold mb-6">

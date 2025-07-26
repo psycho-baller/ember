@@ -87,9 +87,8 @@ export function PhoneNumberForm({ onSuccess }: PhoneNumberFormProps) {
   return (
     <form onSubmit={handleSubmit} className="w-full space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="phone">Phone Number</Label>
-        <div className="relative">
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+        <div className="flex items-center bg-background/50 backdrop-blur-xs rounded-full border border-border/50 p-1">
+          <div className="flex items-center pl-4 text-muted-foreground text-sm">
             +1
           </div>
           <Input
@@ -98,44 +97,41 @@ export function PhoneNumberForm({ onSuccess }: PhoneNumberFormProps) {
             placeholder="(555) 123-4567"
             value={phone.replace("+1", "")}
             onChange={handlePhoneChange}
-            className="pl-10"
+            className="flex-1 border-0 bg-transparent text-sm px-2 py-2 focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground/60"
             disabled={isLoading}
           />
+          <Button
+            type="submit"
+            disabled={isLoading || !phone || !agreedToTerms}
+            size="sm"
+            className="rounded-full px-6 py-2 text-sm font-medium bg-primary hover:bg-primary/90 text-primary-foreground"
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              "Save"
+            )}
+          </Button>
         </div>
-        <p className="text-xs text-muted-foreground">
-          US or Canadian number (10 digits after +1)
-        </p>
+        <div className="flex items-center px-4">
+          <Checkbox
+            id="terms"
+            checked={agreedToTerms}
+            onCheckedChange={(checked) => setAgreedToTerms(checked === true)}
+            disabled={isLoading}
+            className="h-4 w-4 rounded"
+          />
+          <label
+            htmlFor="terms"
+            className="text-xs text-muted-foreground ml-2 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+          >
+            I agree to the <a href="/terms" className="underline hover:text-primary">Terms of Service</a>
+          </label>
+        </div>
       </div>
-
-      <div className="flex items-center space-x-2">
-        <Checkbox
-          id="terms"
-          checked={agreedToTerms}
-          onCheckedChange={(checked) => setAgreedToTerms(checked === true)}
-          disabled={isLoading}
-        />
-        <label
-          htmlFor="terms"
-          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-        >
-          I agree to the <a href="/terms" className="underline hover:text-primary">Terms of Service</a>
-        </label>
-      </div>
-
-      <Button
-        type="submit"
-        className="w-full disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
-        disabled={isLoading || !phone || !agreedToTerms}
-      >
-        {isLoading ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Saving...
-          </>
-        ) : (
-          "Save Phone Number"
-        )}
-      </Button>
     </form>
   );
 }
