@@ -57,12 +57,23 @@ export async function POST(request: Request) {
       workflowId: process.env.VAPI_WORKFLOW_ID!,
     });
 
-    console.log("VAPI response:", response);
 
     if (!response) {
       console.error("Error sending verification code:", response);
       throw new Error("Failed to send verification code");
     }
+
+    // insert call into database
+    const { data, error } = await supabase
+      .from("calls")
+      .upsert({
+        // @ts-ignore
+        vapi_call_id: response.id,
+        user_id: user.id,
+      }, { onConflict: "vapi_call_id" })
+      .select();
+
+    console.log("VAPI response:", response);
 
     return new NextResponse(
       JSON.stringify({ success: true }),
