@@ -5,14 +5,10 @@ import { cn, buttonVariants } from "@/lib/utils";
 import type { ComponentPropsWithoutRef } from "react";
 import styles from "./styles.module.css";
 
-interface Props extends ComponentPropsWithoutRef<typeof Link> {
-
-}
-
 function Component({
   className,
   ...props
-}: Props) {
+}: ComponentPropsWithoutRef<typeof Link>) {
 
 
   return (
