@@ -1,4 +1,5 @@
 import { Linkedin, Instagram, Twitter } from "lucide-react";
+import Link from "next/link";
 
 const Footer = () => {
   const socialLinks = [
@@ -57,6 +58,11 @@ const Footer = () => {
 
             <div className="text-sm text-foreground/60">
               <p>&copy; 2025 Ember. Connecting university students through AI.</p>
+            </div>
+            <div className="mt-8 text-center text-sm text-muted-foreground">
+              <Link href="/terms" className="hover:text-foreground transition-colors">
+                Terms of Service
+              </Link>
             </div>
           </div>
         </div>
