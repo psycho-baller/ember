@@ -4,11 +4,13 @@ import { Suspense, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+import FloatingBlobs from '@/components/landing/FloatingBlobs';
 
 function VerifyEmailContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  
+
   const token_hash = searchParams.get('token_hash');
   const type = searchParams.get('type');
   const next = searchParams.get('next') || '/';
@@ -23,6 +25,11 @@ function VerifyEmailContent() {
         next
       })}`;
     }
+    else {
+      toast.error('Invalid token', {
+        description: 'Please try logging in again.',
+      });
+    }
   }, [token_hash, type, next]);
 
   const handleClick = () => {
@@ -32,26 +39,29 @@ function VerifyEmailContent() {
         type,
         next
       })}`;
+    } else {
+      toast.error('Invalid token', {
+        description: 'Please try logging in again.',
+      });
     }
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Verify Your Email
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Click the button below to complete your sign-in process.
-          </p>
-        </div>
-        <div className="mt-8 space-y-6">
+    <div className="w-full max-w-md px-4">
+      <FloatingBlobs />
+      <div className="text-center">
+        <h1 className="text-3xl font-bold mb-6">
+          Verify Your Email
+        </h1>
+        <p className="text-muted-foreground mb-8">
+          Click the button below to complete your sign-in process.
+        </p>
+        <div className="w-full">
           <Button
             onClick={handleClick}
-            className="group relative flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            className="w-full py-6 text-lg"
           >
-            Continue to Sign In
+            Confirm email
           </Button>
         </div>
       </div>
@@ -63,10 +73,12 @@ export default function VerifyEmail() {
   return (
     <Suspense fallback={
       <div className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent"></div>
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-foreground border-t-transparent"></div>
       </div>
     }>
-      <VerifyEmailContent />
+      <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center">
+        <VerifyEmailContent />
+      </div>
     </Suspense>
   );
 }
