@@ -52,7 +52,7 @@ export async function POST(request: Request) {
       phoneNumberId: process.env.VAPI_PHONE_NUMBER_ID!,
       customer: {
         // name: "User",
-        number: `+1${phone_number}`,
+        number: phone_number,
       },
       workflowId: process.env.VAPI_WORKFLOW_ID!,
     });
