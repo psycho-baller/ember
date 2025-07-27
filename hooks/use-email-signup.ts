@@ -32,7 +32,7 @@ export const useEmailSignup = () => {
         throw new Error(getEmailValidationError(email) || 'Invalid university email');
       }
 
-      const isUCalgaryEmail = email.endsWith('@ucalgary.ca') || email.endsWith('@uwaterloo.ca') || email.endsWith('.ca');
+      const isUCalgaryEmail = email.endsWith('@ucalgary.ca') || email.endsWith('@uwaterloo.ca') || email.endsWith('.ca') || email.endsWith('.edu');
 
       if (isUCalgaryEmail) {
         // For UCalgary emails, send magic link for passwordless sign in
