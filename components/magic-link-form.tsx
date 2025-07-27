@@ -32,11 +32,11 @@ export function MagicLinkForm() {
           description: 'We\'ve sent you a magic link to sign in. Click the link in your email to continue.',
         },
       );
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast(
         'Error',
         {
-          description: error?.message || 'Failed to send magic link',
+          description: error instanceof Error ? error.message : 'Failed to send magic link',
         },
       );
     } finally {
@@ -49,7 +49,7 @@ export function MagicLinkForm() {
       <div className="space-y-2">
         <h3 className="text-lg font-medium">Sign in with a magic link</h3>
         <p className="text-sm text-muted-foreground">
-          Enter your email and we'll send you a link to sign in.
+          Enter your email and we&apos;ll send you a link to sign in.
         </p>
       </div>
 
