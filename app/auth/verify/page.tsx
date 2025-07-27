@@ -17,20 +17,8 @@ function VerifyEmailContent() {
 
   // Auto-redirect if the page is accessed directly with the token
   useEffect(() => {
-    if (token_hash && type) {
-      // If the token is already in the URL, redirect to the confirm endpoint
-      window.location.href = `/auth/confirm?${new URLSearchParams({
-        token_hash,
-        type,
-        next
-      })}`;
-    }
-    else {
-      toast.error('Invalid token', {
-        description: 'Please try logging in again.',
-      });
-    }
-  }, [token_hash, type, next]);
+    handleClick();
+  }, []);
 
   const handleClick = () => {
     if (token_hash && type) {
