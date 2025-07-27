@@ -39,7 +39,8 @@ export const useEmailSignup = () => {
         const { data, error } = await supabase.auth.signInWithOtp({
           email,
           options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback?redirect=/dashboard`,
+            emailRedirectTo: `${window.location.origin}/profile`,
+
             shouldCreateUser: true,
           },
         }) as unknown as AuthResponse;

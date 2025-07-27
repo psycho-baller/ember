@@ -12,26 +12,17 @@ export async function GET(request: NextRequest) {
   if (token_hash && type) {
     const supabase = await createClient();
 
-    try {
-      const { error, data } = await supabase.auth.verifyOtp({
-        type,
-        token_hash,
-      });
-      
-      if (!error) {
-        // If verification is successful, redirect to the specified URL
-        redirect(next);
-      } else if (error.message.includes('Token has expired or is invalid')) {
-        // If the token was already used (likely by Outlook's preview), 
-        // redirect to a page that will check the session and redirect accordingly
-        redirect(`/auth/callback?next=${encodeURIComponent(next)}`);
-      } else {
-        // For other errors, redirect to error page
-        redirect(`/auth/error?error=${encodeURIComponent(error.message)}`);
-      }
-    } catch (error) {
-      // If there's an error (like network issues), try the callback approach
-      redirect(`/auth/callback?next=${encodeURIComponent(next)}`);
+    const { error, data } = await supabase.auth.verifyOtp({
+      type,
+      token_hash,
+    });
+    console.log(data, error);
+    if (!error) {
+      // redirect user to specified redirect URL or root of app
+      redirect(next);
+    } else {
+      // redirect the user to an error page with some instructions
+      redirect(`/auth/error?error=${error?.message}`);
     }
   }
 
