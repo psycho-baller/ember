@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 
-export default function VerifyEmail() {
+function VerifyEmailContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   
@@ -56,5 +56,17 @@ export default function VerifyEmail() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function VerifyEmail() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent"></div>
+      </div>
+    }>
+      <VerifyEmailContent />
+    </Suspense>
   );
 }
