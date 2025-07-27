@@ -7,16 +7,17 @@ export default async function ProfilePage() {
   const supabase = await createClient();
 
   // Get user session
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  if (authError || !user) {
+  const { data, error: authError } = await supabase.auth.getClaims();
+  if (authError || !data?.claims) {
     redirect("/");
   }
+  const claims = data.claims;
 
   // Get user profile with phone number
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("phone_number")
-    .eq("id", user.id)
+    .eq("id", claims.sub)
     .single();
 
   const hasPhoneNumber = !!profile?.phone_number;
