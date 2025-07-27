@@ -56,7 +56,7 @@ const Footer = () => {
             </div>
 
             <div className="text-sm text-foreground/60">
-              <p>&copy; 2025 Ember. Connecting UCalgary students through AI.</p>
+              <p>&copy; 2025 Ember. Connecting university students through AI.</p>
             </div>
           </div>
         </div>
