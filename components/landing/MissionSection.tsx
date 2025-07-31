@@ -5,20 +5,21 @@ const MissionSection = () => {
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div className="space-y-6">
             <h2 className="text-4xl md:text-5xl font-display font-bold text-foreground">
-              University is about{" "}
+              {/* It shouldn't be that hard to */}
               <span className="bg-linear-to-r from-primary to-accent-custom bg-clip-text text-transparent">
-                finding your people
+                Effortlessly{" "}
               </span>
+              find exactly who you're looking for
             </h2>
             <div className="space-y-4 text-lg text-muted-foreground leading-relaxed">
               <p>
-                Whether you&apos;re looking for <strong className="text-foreground">friends, study buddies, mentors, collaborators, or even a life partner</strong>—I&apos;ve got you covered.
+                Whether you&apos;re looking for <strong className="text-foreground">friends, study buddies, mentors, collaborators, or even a life partner {" "}</strong>as you go through your day, I got you covered.
               </p>
               <p>
-                I get to know you through our chat, create your profile, and find perfect matches on campus. When I find someone great, I&apos;ll share your profiles with each other (only if you both approve!) and set up a group chat.
+                I get to know you through our chat, create your profile, and as soon as you pass by someone who I think you might like, I&apos;ll provide more information about them for you to decide if you want to connect.
               </p>
               <p className="text-primary font-medium">
-                It&apos;s that simple. One warm intro, endless possibilities.
+                Call me {'->'} Go about your day {'->'} I find you someone who you might like and fits your schedule
               </p>
             </div>
           </div>
@@ -35,12 +36,12 @@ const MissionSection = () => {
                 </div>
                 <div className="bg-background/90 border border-primary/20 p-4 rounded-2xl">
                   <p className="text-sm text-foreground font-medium">
-                    &quot;I&apos;m looking for someone to start a tech startup with...&quot;
+                    &quot;I just talked to a MATH 211 classmate who also goes to bake chef after class. Want an intro?&quot;
                   </p>
                 </div>
                 <div className="bg-background/90 border border-accent-custom/20 p-4 rounded-2xl">
                   <p className="text-sm text-foreground font-medium">
-                    &quot;I&apos;ve found 3 people in Software Engineering who are also interested in AI and have startup experience!&quot;
+                    &quot;I found 3 people who enjoy listening to similar podcasts as you and are looking for a lunch buddy...&quot;
                   </p>
                 </div>
               </div>
