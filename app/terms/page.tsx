@@ -20,7 +20,7 @@ const TermsPage = () => {
       <div className="prose prose-lg dark:prose-invert max-w-none">
         <div className="bg-card p-6 rounded-lg shadow-sm mb-8">
           <p className="text-lg leading-relaxed">
-            Ember's Terms of Service summarize how you can sign up with your university email, interact via chat to build a personalized profile, opt into profile sharing and group chats, and trust that your data is used responsibly under Alberta law. These Terms define key concepts like "Service" and "Connection Profile," outline age requirements and user expectations, explain how we process your data with third-party AI providers, and set out liability limits and contact details.
+            Ember&apos;s Terms of Service summarize how you can sign up with your university email, interact via chat to build a personalized profile, opt into profile sharing and group chats, and trust that your data is used responsibly under Alberta law. These Terms define key concepts like "Service" and "Connection Profile," outline age requirements and user expectations, explain how we process your data with third-party AI providers, and set out liability limits and contact details.
           </p>
         </div>
 
@@ -28,19 +28,19 @@ const TermsPage = () => {
           <h2 className="text-2xl font-semibold mb-4 pb-2 border-b border-border">Definitions</h2>
           <ul className="space-y-3">
             <li className="flex">
-              <span className="font-medium text-primary mr-2 text-nowrap">"Service"</span>
+              <span className="font-medium text-primary mr-2 text-nowrap">&quot;Service&quot;</span>
               means Ember, the AI superconnector accessible at heyember.vercel.app.
             </li>
             <li className="flex">
-              <span className="font-medium text-primary mr-2 text-nowrap">"User"</span>
+              <span className="font-medium text-primary mr-2 text-nowrap">&quot;User&quot;</span>
               means any individual who registers with a valid US or Canadian university email and interacts with Ember via chat.
             </li>
             <li className="flex">
-              <span className="font-medium text-primary mr-2 text-nowrap">"Connection Profile"</span>
+              <span className="font-medium text-primary mr-2 text-nowrap">&quot;Connection Profile&quot;</span>
               means the information collected during your conversation with Ember, including interests, academic details, and match preferences.
             </li>
             <li className="flex">
-              <span className="font-medium text-primary mr-2 text-nowrap">"Match"</span>
+              <span className="font-medium text-primary mr-2 text-nowrap">&quot;Match&quot;</span>
               means another User whose Connection Profile aligns with yours and who has mutually opted in to receive introductions.
             </li>
           </ul>
