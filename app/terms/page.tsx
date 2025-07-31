@@ -20,7 +20,7 @@ const TermsPage = () => {
       <div className="prose prose-lg dark:prose-invert max-w-none">
         <div className="bg-card p-6 rounded-lg shadow-sm mb-8">
           <p className="text-lg leading-relaxed">
-            Ember&apos;s Terms of Service summarize how you can sign up with your university email, interact via chat to build a personalized profile, opt into profile sharing and group chats, and trust that your data is used responsibly under Alberta law. These Terms define key concepts like "Service" and "Connection Profile," outline age requirements and user expectations, explain how we process your data with third-party AI providers, and set out liability limits and contact details.
+            Ember&apos;s Terms of Service summarize how you can sign up with your university email, interact via chat to build a personalized profile, opt into profile sharing and group chats, and trust that your data is used responsibly under Alberta law. These Terms define key concepts like &quot;Service&quot; and &quot;Connection Profile&quot;, outline age requirements and user expectations, explain how we process your data with third-party AI providers, and set out liability limits and contact details.
           </p>
         </div>
 
