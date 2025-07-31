@@ -4,7 +4,7 @@ import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import Header from "@/components/Header";
 import { Toaster } from "@/components/ui/sonner"
-
+import { Analytics } from "@vercel/analytics/next"
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
   : "http://localhost:3000";
@@ -12,7 +12,7 @@ const defaultUrl = process.env.VERCEL_URL
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
   title: "Ember AI - Your AI uni superconnector",
-  description: "Your AI superconnector at the University of Calgary. I help you find exactly who you\'re looking for through a single warm intro.",
+  description: "Your AI superconnector I help you find exactly who you\'re looking for as you go through your day",
 };
 
 const geistSans = Geist({
@@ -28,6 +28,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <Analytics />
       <body className={`${geistSans.className} antialiased min-h-screen`}>
         <Header />
         <Toaster />
