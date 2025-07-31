@@ -90,7 +90,7 @@ const TermsPage = () => {
 
         <section className="mb-12">
           <h2 className="text-2xl font-semibold mb-4 pb-2 border-b border-border">Limitation of Liability</h2>
-          <p>The Service is provided on an "AS IS" and "AS AVAILABLE" basis without warranties of any kind.</p>
+          <p>The Service is provided on an &quot;AS IS&quot; and &quot;AS AVAILABLE&quot; basis without warranties of any kind.</p>
           <p>Ember is not liable for any indirect, incidental, special, or consequential damages arising from your use of the Service.</p>
         </section>
 
