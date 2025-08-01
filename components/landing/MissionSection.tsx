@@ -9,7 +9,7 @@ const MissionSection = () => {
               <span className="bg-linear-to-r from-primary to-accent-custom bg-clip-text text-transparent">
                 Effortlessly{" "}
               </span>
-              find exactly who you're looking for
+              find exactly who you&apos;re looking for
             </h2>
             <div className="space-y-4 text-lg text-muted-foreground leading-relaxed">
               <p>
