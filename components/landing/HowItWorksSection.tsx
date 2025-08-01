@@ -10,7 +10,7 @@ const steps = [
     mockup: {
       type: "chat",
       messages: [
-        { sender: "user", text: "I'm looking for someone in my Sociology class who would be interested in playing basketball after class" },
+        { sender: "user", text: "I'm looking for someone in my Psychology class who would be interested in playing basketball after class" },
         { sender: "ember", text: "I think I know just the person for you!" },
       ]
     }
@@ -23,18 +23,18 @@ const steps = [
     color: "from-accent-custom to-accent-glow",
     mockup: {
       type: "loading",
-      text: "Creating your connection profile..."
+      text: "Creating your profile..."
     }
   },
   {
     number: "3",
-    title: "Magic Happens: Perfect Matches & Group Chat",
-    description: "I find your perfect matches, share profiles (only if you both approve!), and set up a group chat to break the ice.",
+    title: "I connect you with the right people at the right time",
+    description: "As you go about your day, I'll find your perfect matches and connect you with them.",
     icon: Users,
     color: "from-primary-glow to-accent-custom",
     mockup: {
       type: "notification",
-      text: "Found your match! Setting up group chat with Alex..."
+      text: "Alex from the floor above is also looking for someone to speak french with"
     }
   }
 ];
@@ -56,7 +56,7 @@ const HowItWorksSection = () => {
           {steps.map((step, index) => (
             <div
               key={step.number}
-              className="glass-card p-8 rounded-3xl hover:scale-105 transition-all duration-300 group"
+              className="glass-card p-8 rounded-3xl hover:scale-[1.02] transition-all duration-300 group"
               style={{ animationDelay: `${index * 0.2}s` }}
             >
               {/* Step Number */}
