@@ -46,10 +46,11 @@ function VerifyEmailContent() {
           Waking up Ember🥱
         </h1>
         <p className="text-muted-foreground mb-8">
-
+          Can't wait to meet you!
         </p>
-        <div className="flex justify-center">
-          <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+        <div className="relative flex justify-center items-center h-14 w-14 mx-auto my-6">
+          <div className="absolute inset-0 border-2 border-primary/20 rounded-full"></div>
+          <div className="absolute inset-0 border-t-2 border-r-2 border-primary rounded-full animate-spin"></div>
         </div>
       </div>
     </div>
