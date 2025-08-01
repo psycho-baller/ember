@@ -3,8 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useEmailSignup } from "@/hooks/use-email-signup";
 import { motion } from "framer-motion";
-import { toast } from "sonner";
-import { isValidUniversityEmail, getEmailValidationError } from "@/lib/email-utils";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 
@@ -36,13 +34,13 @@ const HeroSection = () => {
       return;
     }
 
-    // Check if it's a valid university email
-    if (!isValidUniversityEmail(email)) {
-      const errorMessage = getEmailValidationError(email);
-      setError(errorMessage);
+    // // Check if it's a valid university email
+    // if (!isValidUniversityEmail(email)) {
+    //   const errorMessage = getEmailValidationError(email);
+    //   setError(errorMessage);
 
-      return;
-    }
+    //   return;
+    // }
 
     try {
       setIsSubmitted(true);

@@ -32,53 +32,53 @@ export const useEmailSignup = () => {
         throw new Error(getEmailValidationError(email) || 'Invalid university email');
       }
 
-      const isUCalgaryEmail = email.endsWith('@ucalgary.ca') || email.endsWith('@uwaterloo.ca') || email.endsWith('.ca') || email.endsWith('.edu');
+      // const isUCalgaryEmail = email.endsWith('@ucalgary.ca') || email.endsWith('@uwaterloo.ca') || email.endsWith('.ca') || email.endsWith('.edu');
 
-      if (isUCalgaryEmail) {
-        // For UCalgary emails, send magic link for passwordless sign in
-        const { data, error } = await supabase.auth.signInWithOtp({
-          email,
-          options: {
-            emailRedirectTo: `${window.location.origin}/profile`,
+      // if (isUCalgaryEmail) {
+      // For UCalgary emails, send magic link for passwordless sign in
+      const { data, error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/profile`,
 
-            shouldCreateUser: true,
-          },
-        }) as unknown as AuthResponse;
-        console.log(data, error);
+          shouldCreateUser: true,
+        },
+      }) as unknown as AuthResponse;
+      console.log(data, error);
 
-        if (error) throw error;
+      if (error) throw error;
 
-        toast("Check your email!", {
-          description: `We've sent a magic link to ${email}. Click it to sign in.`,
-        });
+      toast("Check your email!", {
+        description: `We've sent a magic link to ${email}. Click it to sign in.`,
+      });
 
-        return { success: true, user: data?.user };
-      } else {
-        // For non-UCalgary emails, just add to waitlist
-        const { error: waitlistError } = await supabase
-          .from('email_waitlist')
-          .insert(
-            {
-              email,
-            }
-          );
+      return { success: true, user: data?.user };
+      // } else {
+      //   // For non-UCalgary emails, just add to waitlist
+      //   const { error: waitlistError } = await supabase
+      //     .from('email_waitlist')
+      //     .insert(
+      //       {
+      //         email,
+      //       }
+      //     );
 
-        if (waitlistError) {
-          throw new Error('Failed to add to waitlist. Please try again.');
-        }
+      //   if (waitlistError) {
+      //     throw new Error('Failed to add to waitlist. Please try again.');
+      //   }
 
-        console.log('Added to waitlist:', email);
+      // console.log('Added to waitlist:', email);
 
-        // Store the email in localStorage
-        localStorage.setItem('waitlistEmail', email);
-        setWaitlistEmail(email);
+      // // Store the email in localStorage
+      // localStorage.setItem('waitlistEmail', email);
+      // setWaitlistEmail(email);
 
-        toast("Thanks for your interest!", {
-          description: "We've added you to our waitlist. We'll notify you when we expand to your university!",
-        });
+      // toast("Thanks for your interest!", {
+      //   description: "We've added you to our waitlist. We'll notify you when we expand to your university!",
+      // });
 
-        return { success: true, user: null };
-      }
+      // return { success: true, user: null };
+      // }
     } catch (error: any) {
       console.error('Email signup error:', error);
       toast("Error", {
