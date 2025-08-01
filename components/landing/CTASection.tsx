@@ -57,14 +57,14 @@ const CTASection = () => {
       <div className="max-w-4xl mx-auto text-center">
         <div className="glass-card p-12 rounded-3xl">
           <h2 className="text-4xl md:text-5xl font-display font-bold mb-6">
-            Ready to find your{" "}
+            Ready to{" "}
             <span className="bg-linear-to-r from-primary to-accent-custom bg-clip-text text-transparent">
-              perfect people
+            find your people
             </span>
             ?
           </h2>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Be the first to find your people on campus. Sign up with your university email.
+            Let's chat for a few minutes and the rest is on me😉
           </p>
 
           {isLoggedIn ? (

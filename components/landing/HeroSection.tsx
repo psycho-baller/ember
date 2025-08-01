@@ -22,7 +22,7 @@ const HeroSection = () => {
       const { data: { session } } = await supabase.auth.getSession();
       setIsLoggedIn(!!session);
     };
-    
+
     checkAuth();
   }, []);
 
@@ -65,12 +65,14 @@ const HeroSection = () => {
             </span>
           </h1>
           <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            I help you find exactly who you&apos;re looking for. A friend, a mentor, a hobby buddy, or even a life partner.
+            {/* I bring you exactly who you&apos;re looking for at the */}
+            {/* I go wherever you go to find you someone */}
+            I know everyone at your university😎. Let's chat and I'll help you find exactly who you're looking to connect with.
           </p>
         </div>
 
         {isLoggedIn ? (
-          <Button 
+          <Button
             onClick={() => router.push('/profile')}
             size="lg"
             className="rounded-full px-8 py-6 text-base font-medium bg-primary hover:bg-primary/90 text-primary-foreground"
