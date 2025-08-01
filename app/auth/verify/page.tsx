@@ -49,7 +49,7 @@ function VerifyEmailContent() {
         <div className="w-full">
           <Button
             onClick={handleClick}
-            className="w-full py-6 text-lg"
+            className="w-full py-6 text-lg disabled:opacity-50"
             disabled={isButtonDisabled}
           >
             Confirm email
