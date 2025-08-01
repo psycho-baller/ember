@@ -67,7 +67,7 @@ const HeroSection = () => {
           <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
             {/* I bring you exactly who you&apos;re looking for at the */}
             {/* I go wherever you go to find you someone */}
-            I know everyone at your university😎. Let&apos;s chat and I&apos;ll help you find exactly who you&apos;re looking to connect with.
+            I know everyone at your university😎. Let&apos;s chat and I&apos;ll connect you with exactly who you&apos;re looking for
           </p>
         </div>
 
