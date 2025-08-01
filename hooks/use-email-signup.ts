@@ -28,9 +28,9 @@ export const useEmailSignup = () => {
     setIsLoading(true);
     try {
       // Validate university email
-      if (!isValidUniversityEmail(email)) {
-        throw new Error(getEmailValidationError(email) || 'Invalid university email');
-      }
+      // if (!isValidUniversityEmail(email)) {
+      //   throw new Error(getEmailValidationError(email) || 'Invalid university email');
+      // }
 
       // const isUCalgaryEmail = email.endsWith('@ucalgary.ca') || email.endsWith('@uwaterloo.ca') || email.endsWith('.ca') || email.endsWith('.edu');
 
