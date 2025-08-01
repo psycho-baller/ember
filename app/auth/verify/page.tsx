@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
@@ -8,8 +8,8 @@ import { toast } from 'sonner';
 import FloatingBlobs from '@/components/landing/FloatingBlobs';
 
 function VerifyEmailContent() {
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const searchParams = useSearchParams();
-  const router = useRouter();
 
   const token_hash = searchParams.get('token_hash');
   const type = searchParams.get('type');
@@ -18,9 +18,10 @@ function VerifyEmailContent() {
   // Auto-redirect if the page is accessed directly with the token
   useEffect(() => {
     handleClick();
-  }, []);
+  }, [token_hash, type, next]);
 
   const handleClick = () => {
+    setIsButtonDisabled(true);
     if (token_hash && type) {
       window.location.href = `/auth/confirm?${new URLSearchParams({
         token_hash,
@@ -32,6 +33,7 @@ function VerifyEmailContent() {
         description: 'Please try logging in again.',
       });
     }
+    setIsButtonDisabled(false);
   };
 
   return (
@@ -48,6 +50,7 @@ function VerifyEmailContent() {
           <Button
             onClick={handleClick}
             className="w-full py-6 text-lg"
+            disabled={isButtonDisabled}
           >
             Confirm email
           </Button>
