@@ -42,7 +42,7 @@ function VerifyEmailContent() {
     <div className="w-full max-w-md px-4">
       <FloatingBlobs />
       <div className="text-center">
-        <h1 className="text-3xl font-bold mb-6">
+        <h1 className="text-4xl font-bold mb-6">
           Waking up Ember🥱
         </h1>
         <p className="text-muted-foreground mb-8">
