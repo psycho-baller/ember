@@ -64,7 +64,7 @@ const CTASection = () => {
             ?
           </h2>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Let's chat for a few minutes and the rest is on me😉
+            Let&apos;s chat for a few minutes and the rest is on me😉
           </p>
 
           {isLoggedIn ? (
