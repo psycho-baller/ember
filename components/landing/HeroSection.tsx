@@ -5,13 +5,15 @@ import { useEmailSignup } from "@/hooks/use-email-signup";
 import { motion } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import WhatsAppButton from "../WhatsAppButton";
 
 const HeroSection = () => {
   const [email, setEmail] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const { signUpWithEmail, isLoading, waitlistEmail } = useEmailSignup();
+  const [showWhatsAppButton, setShowWhatsAppButton] = useState(false);
+  const { signUpWithEmail, isLoading } = useEmailSignup();
   const router = useRouter();
 
   useEffect(() => {
@@ -34,19 +36,14 @@ const HeroSection = () => {
       return;
     }
 
-    // // Check if it's a valid university email
-    // if (!isValidUniversityEmail(email)) {
-    //   const errorMessage = getEmailValidationError(email);
-    //   setError(errorMessage);
-
-    //   return;
-    // }
-
     try {
       setIsSubmitted(true);
       await signUpWithEmail(email);
+      // Show WhatsApp button immediately after successful university email submission
+      setShowWhatsAppButton(true);
     } catch (err) {
       setError('Failed to process your request. Please try again.');
+      setShowWhatsAppButton(false);
     } finally {
       setIsSubmitted(false);
     }
@@ -77,7 +74,7 @@ const HeroSection = () => {
           >
             Go to Profile
           </Button>
-        ) : !waitlistEmail ? (
+        ) : !showWhatsAppButton ? (
           <motion.div
             className="glass-card p-6 rounded-3xl max-w-md mx-auto mb-8"
             animate={isSubmitted ? { scale: 0.98, opacity: 0.8 } : { scale: 1, opacity: 1 }}
@@ -125,9 +122,17 @@ const HeroSection = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="text-center">
-              <h3 className="text-lg font-medium mb-2">🎉 You&apos;re on the waitlist!</h3>
-              <p className="text-sm text-muted-foreground">We&apos;ll notify you at {waitlistEmail} when we expand to your university.</p>
+            <div className="text-center space-y-4">
+              <h3 className="text-lg font-medium mb-2">🎉 Thanks for joining!</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Click below to chat with us on WhatsApp and get started right away!
+              </p>
+              <div className="flex justify-center">
+                <WhatsAppButton
+                  phoneNumber="+14155238886"
+                  message="Hi! I just signed up and I'm excited to learn more about Orbit AI."
+                />
+              </div>
             </div>
           </motion.div>
         )}
