@@ -7,6 +7,7 @@ import { ExternalLink, QrCode } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Button } from "./ui/button";
 
 const ScanPage = () => {
   const searchParams = useSearchParams();
@@ -15,10 +16,11 @@ const ScanPage = () => {
 
   useEffect(() => {
     const generateQRCode = async () => {
+      if (!url) return;
       try {
         const qrUrl = await QRCode.toDataURL(url, {
           width: 256,
-          margin: 2,
+          margin: 0,
           color: {
             dark: "#000000",
             light: "#FFFFFF",
@@ -40,13 +42,10 @@ const ScanPage = () => {
 
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-background">
-      <FloatingBlobs />
-
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4">
+      // <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4">
         <div className="w-full max-w-md">
-          <Card className="glass-card border border-border/50 bg-background/80 backdrop-blur-sm shadow-lg">
-            <CardContent className="p-8 text-center space-y-6">
+          <div className="glass-card border border-border/50 bg-background/50 backdrop-blur-sm shadow-lg rounded-2xl">
+            <div className="p-8 text-center space-y-4">
               {/* Header Icon */}
               <div className="flex justify-center">
                 <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
@@ -57,10 +56,10 @@ const ScanPage = () => {
               {/* Title */}
               <div className="space-y-2">
                 <h1 className="text-xl font-semibold text-foreground">
-                  Scan QR Code
+                  Chat with Ember on WhatsApp!
                 </h1>
                 <p className="text-sm text-muted-foreground">
-                  Scan this QR code with your phone to open the link
+                  Scan this QR code with your phone to chat with me
                 </p>
               </div>
 
@@ -85,24 +84,27 @@ const ScanPage = () => {
               </div>
 
               {/* Open Link Button */}
-              <Link
+              <Button
+                onClick={() => window.open(url, "_blank")}
+                className="w-full bg-primary/90 hover:bg-primary text-primary-foreground font-medium"
+                size="lg"
+              >
+              {/* <Link
                 href={url}
                 target="_blank"
-                className="w-full bg-primary/90 hover:bg-primary text-primary-foreground font-medium"
-              >
+              > */}
                 <ExternalLink className="w-4 h-4 mr-2" />
                 Open Link
-              </Link>
-
+              {/* </Link> */}
+              </Button>
               {/* URL Display */}
               <p className="text-xs text-muted-foreground break-all px-2">
-                {url}
+                This will open WhatsApp Web
               </p>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
+      // </div>
   );
 };
 
