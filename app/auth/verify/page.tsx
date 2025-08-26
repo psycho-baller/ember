@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import FloatingBlobs from '@/components/landing/FloatingBlobs';
+import Spinner from '@/components/spinner';
 
 function VerifyEmailContent() {
   const searchParams = useSearchParams();
@@ -59,11 +60,7 @@ function VerifyEmailContent() {
 
 export default function VerifyEmail() {
   return (
-    <Suspense fallback={
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-foreground border-t-transparent"></div>
-      </div>
-    }>
+    <Suspense fallback={<Spinner />}>
       <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center">
         <VerifyEmailContent />
       </div>
