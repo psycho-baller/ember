@@ -1,7 +1,7 @@
 // app/api/whatsapp/status-callback/route.ts
 
 import { NextResponse } from 'next/server';
-import { twiml as Twiml, validateRequest } from 'twilio';
+import { validateRequest } from 'twilio';
 
 const authToken = process.env.TWILIO_AUTH_TOKEN!;
 
@@ -10,7 +10,7 @@ export async function POST(req: Request) {
   const headers = Object.fromEntries(req.headers);
   const body = await req.text();
 
-  if (!validateRequest(authToken, headers['x-twilio-signature']!, url, body)) {
+  if (!validateRequest(authToken, headers['x-twilio-signature']!, url, { body })) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 403 });
   }
 
