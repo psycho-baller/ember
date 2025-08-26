@@ -1,0 +1,55 @@
+import { NextResponse } from 'next/server';
+import twilio from 'twilio';
+
+export async function POST(request: Request) {
+  try {
+    // Parse the request body
+    const formData = await request.formData();
+    const body = Object.fromEntries(formData.entries());
+
+    // Initialize Twilio client
+    const twilioSignature = request.headers.get('x-twilio-signature');
+    const url = new URL(request.url);
+    const fullUrl = `${process.env.NEXT_PUBLIC_APP_URL}${url.pathname}`;
+
+    // Validate the request is from Twilio
+    const client = twilio(process.env.TWILIO_ACCOUNT_SID);
+    const validator = twilio.validateRequest(
+      process.env.TWILIO_AUTH_TOKEN!,
+      twilioSignature || '',
+      fullUrl,
+      body
+    );
+
+    if (!validator) {
+      return new NextResponse('Invalid signature', { status: 401 });
+    }
+
+    const message = body.Body.toString();
+    const from = body.From.toString();
+
+    // Here you can process the incoming message
+    console.log(`Received message from ${from}: ${message}`);
+
+    // Auto-respond (optional)
+    if (message.toLowerCase().includes('hello')) {
+      const twilioClient = twilio(
+        process.env.TWILIO_ACCOUNT_SID,
+        process.env.TWILIO_AUTH_TOKEN
+      );
+
+      await twilioClient.messages.create({
+        body: 'Hello! Thanks for your message. How can I assist you today?',
+        from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
+        to: from
+      });
+    }
+
+    return new NextResponse('<Response></Response>', {
+      headers: { 'Content-Type': 'text/xml' },
+    });
+  } catch (error) {
+    console.error('Error processing webhook:', error);
+    return new NextResponse('Error processing webhook', { status: 500 });
+  }
+}
