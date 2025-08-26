@@ -27,10 +27,11 @@ export async function POST(request: Request) {
       success: true,
       messageSid: response.sid
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error sending WhatsApp message:', error);
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
     return NextResponse.json(
-      { error: error.message || 'Failed to send message' },
+      { error: errorMessage },
       { status: 500 }
     );
   }
