@@ -49,7 +49,7 @@ export async function updateSession(request: NextRequest) {
 
   // List of public routes that don't require authentication
   const publicRoutes = [
-    "/",
+    "",
     "/scan",
     "/terms",
     "/api/whatsapp"
