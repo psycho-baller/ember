@@ -20,7 +20,7 @@ export default function WhatsAppButton({ phoneNumber = '1234567890', message = '
 
   // Create the WhatsApp URL
   const whatsappUrl = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(message)}`;
-  const scanUrl = `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/scan?url=${encodeURIComponent(whatsappUrl)}`;
+  const scanUrl = `${window.location.origin || process.env.NEXT_PUBLIC_APP_URL}/scan?url=${encodeURIComponent(whatsappUrl)}`;
 
   // Use direct WhatsApp URL on mobile, scan URL on desktop
   const buttonUrl = isMobile ? whatsappUrl : scanUrl;
@@ -31,10 +31,10 @@ export default function WhatsAppButton({ phoneNumber = '1234567890', message = '
       asChild
       className="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-full flex items-center gap-2 shadow-lg transition-all hover:scale-105"
     >
-      <a href={buttonUrl} target="_blank" rel="noopener noreferrer">
+      <Link href={buttonUrl} target="_blank" rel="noopener noreferrer">
         <MessageCircle className="w-5 h-5" />
         Chat with me on WhatsApp!
-      </a>
+      </Link>
     </Button>
     <p className="text-xs text-muted-foreground mt-2 text-center">
       By chatting with me, you agree to our <Link href="/terms" target="_blank" className="underline">Terms of Service</Link>
