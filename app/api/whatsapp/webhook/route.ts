@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { validateRequest } from 'twilio';
 import { twilioClient } from '@/lib/twilio';
+import { SharedStore } from '@/lib/pocketflow/types';
+import { createAgentFlow } from '@/lib/pocketflow/flow';
 
 export async function POST(request: Request) {
   try {
@@ -31,7 +33,7 @@ export async function POST(request: Request) {
     }
 
     const message = body.Body.toString();
-    const from = body.From.toString();
+    const from = body.From.toString().replace("whatsapp:", "");
     const profileName = body.ProfileName.toString();
 
     // Here you can process the incoming message
@@ -40,23 +42,43 @@ export async function POST(request: Request) {
     // Auto-respond (optional)
     // if (message.toLowerCase().includes('hello')) {
 
+    const [firstName, lastName] = profileName.split(" ");
+
+    await new Promise((resolve) => setTimeout(resolve, 1500));
     await twilioClient.messages.create({
       body: `Hey${profileName ? ` ${profileName}` : ''}, I'm a lil busy rn, but I'll get back to you asap!`,
       from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
       to: from
     });
 
+    await new Promise((resolve) => setTimeout(resolve, 500));
     await twilioClient.messages.create({
       body: "In the meantime, make sure you confirm your ucalgary email with the link I sent you",
       from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
       to: from
     });
 
-    return new NextResponse('<Response><Message>✅</Message></Response>', {
+    // return new NextResponse('<Response><Message>✅</Message></Response>', {
+    //   headers: { 'Content-Type': 'text/xml' },
+    // });
+
+    // const shared: SharedStore = {
+    //   user: { phone: from, firstName },
+    //   incomingMessage: message,
+    // };
+
+    // const flow = createAgentFlow();
+    // await flow.run(shared);
+
+    // if (shared.aiResponse) {
+    //   return NextResponse.json({ success: true, response: shared.aiResponse });
+    // }
+
+    return new NextResponse('<Response></Response>', {
       headers: { 'Content-Type': 'text/xml' },
     });
-  } catch (error) {
-    console.error('Error processing webhook:', error);
-    return new NextResponse('Error processing webhook', { status: 500 });
+  } catch (err) {
+    console.error(err);
+    return new NextResponse("Internal Server Error", { status: 500 });
   }
 }
