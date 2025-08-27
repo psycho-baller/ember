@@ -129,8 +129,8 @@ const HeroSection = () => {
               </p>
               <div className="flex justify-center">
                 <WhatsAppButton
-                  phoneNumber="+14155238886"
-                  message="Hi! I just signed up and I'm excited to learn more about Orbit AI."
+                  phoneNumber={process.env.NEXT_PUBLIC_TWILIO_PHONE_NUMBER!}
+                  message="hey what's all this about?"
                 />
               </div>
             </div>
