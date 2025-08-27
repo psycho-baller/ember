@@ -10,7 +10,7 @@ export async function POST(request: Request) {
     // Initialize Twilio client
     const twilioSignature = request.headers.get('x-twilio-signature');
     const url = new URL(request.url);
-    const fullUrl = `${process.env.NEXT_PUBLIC_APP_URL}${url.pathname}`;
+    const fullUrl = `${process.env.APP_URL}${url.pathname}`;
 
     console.log("fullUrl", fullUrl);
     console.log("twilioSignature", twilioSignature);
