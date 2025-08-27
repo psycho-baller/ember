@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import PhoneNumberForm from "@/components/phone-number-form";
 import PhoneButton from "@/components/secondary-button-link/phone-button";
+import WhatsAppButton from "@/components/WhatsAppButton";
 
 export default async function ProfilePage() {
   const supabase = await createClient();
@@ -46,9 +47,12 @@ export default async function ProfilePage() {
         ) : (
           <div className="text-left">
             <p className="text-muted-foreground mb-6">
-              I&apos;m excited to get to know you more! Just drop your phone number and I&apos;ll call you back as soon as possible
+              I&apos;m excited to get to know you more! Let's chat on WhatsApp
             </p>
-            <PhoneNumberForm />
+            <WhatsAppButton
+              phoneNumber={process.env.NEXT_PUBLIC_TWILIO_PHONE_NUMBER!}
+              message="hey what's all this about?"
+            />
           </div>
         )}
       </div>
