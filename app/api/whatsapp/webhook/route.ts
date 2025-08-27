@@ -42,7 +42,7 @@ export async function POST(request: Request) {
 
     const [firstName, lastName] = profileName.split(" ");
 
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
     // await twilioClient.messages.create({
     //   body: `Hey${profileName ? ` ${profileName}` : ''}, I'm a lil busy rn, but I'll get back to you asap!`,
     //   from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
@@ -50,7 +50,7 @@ export async function POST(request: Request) {
     // });
 
     await twilioClient.messages.create({
-      body: `Hey${profileName ? ` ${firstName}` : ''}, I'm Ember, UCalgary's superconnector.
+      body: `hey${profileName ? ` ${firstName}` : ''}, I'm Ember, UCalgary's superconnector.
 
 I help you find exactly who you're looking for. A friend. A community. A group project buddy. A mentor. And even a life partner.
 
@@ -63,18 +63,18 @@ Here's how it works:
       from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
       to: from
     });
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
     await twilioClient.messages.create({
       body: "while I still can't text, in the meantime feel free to call me. I'd love to get to know you more over the phone",
       from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
       to: from
     });
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    await twilioClient.messages.create({
-      body: "oh and also make sure you confirm your ucalgary email with the link I sent you",
-      from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
-      to: from
-    });
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+    // await twilioClient.messages.create({
+    //   body: "oh and also make sure you confirm your ucalgary email with the link I sent you",
+    //   from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
+    //   to: from
+    // });
 
     // return new NextResponse('<Response><Message>✅</Message></Response>', {
     //   headers: { 'Content-Type': 'text/xml' },
