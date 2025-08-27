@@ -27,9 +27,9 @@ export async function POST(request: Request) {
 
     console.log("validator", validator);
 
-    if (!validator) {
-      return new NextResponse('Invalid signature', { status: 401 });
-    }
+    // if (!validator) {
+    //   return new NextResponse('Invalid signature', { status: 401 });
+    // }
 
     const message = body.Body.toString();
     const from = body.From.toString();
