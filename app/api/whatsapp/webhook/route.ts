@@ -12,6 +12,10 @@ export async function POST(request: Request) {
     const url = new URL(request.url);
     const fullUrl = `${process.env.NEXT_PUBLIC_APP_URL}${url.pathname}`;
 
+    console.log("fullUrl", fullUrl);
+    console.log("twilioSignature", twilioSignature);
+    console.log("body", body);
+
     // Validate the request is from Twilio
     const client = twilio(process.env.TWILIO_ACCOUNT_SID);
     const validator = twilio.validateRequest(
@@ -21,12 +25,15 @@ export async function POST(request: Request) {
       body
     );
 
+    console.log("validator", validator);
+
     if (!validator) {
       return new NextResponse('Invalid signature', { status: 401 });
     }
 
     const message = body.Body.toString();
     const from = body.From.toString();
+    const profileName = body.ProfileName.toString();
 
     // Here you can process the incoming message
     console.log(`Received message from ${from}: ${message}`);
