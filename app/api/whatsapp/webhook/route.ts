@@ -1,20 +1,14 @@
 import { NextResponse } from 'next/server';
-import twilio from 'twilio';
 import { validateRequest } from 'twilio';
+import { twilioClient } from '@/lib/twilio';
 
 export async function POST(request: Request) {
   try {
     // Parse the request body and preserve empty values
     const formData = await request.formData();
-    console.log("formData", formData);
     const body = Object.fromEntries(
-      Array.from(formData.entries()).map(([key, value]) => [key, value.toString()])
-    );
-    console.log("body", body);
-    const oldBody = Object.fromEntries(
       formData.entries()
     );
-    console.log("oldBody", oldBody);
 
 
     // Initialize Twilio client
@@ -22,31 +16,19 @@ export async function POST(request: Request) {
     // 2) Reconstruct the EXACT public URL Twilio hit (don’t use req.url if behind proxy)
     const host = request.headers.get("x-forwarded-host") || request.headers.get("host");
     const proto = request.headers.get("x-forwarded-proto") || "https";
-    const betterUrl = `${proto}://${host}/api/whatsapp/webhook`;
-    console.log("betterUrl", betterUrl);
-    const url = new URL(request.url);
-    console.log("url", url);
-    const fullUrl = `${process.env.APP_URL}${url.pathname}`;
-
-    console.log("fullUrl", fullUrl);
-    console.log("twilioSignature", twilioSignature);
-    console.log("body", body);
-    console.log("SID", process.env.TWILIO_ACCOUNT_SID);
-    console.log("TOKEN", process.env.TWILIO_AUTH_TOKEN);
+    const url = `${proto}://${host}/api/whatsapp/webhook`;
 
     // Validate the request is from Twilio
     const validator = validateRequest(
       process.env.TWILIO_AUTH_TOKEN!,
       twilioSignature || '',
-      betterUrl,
+      url,
       body
     );
 
-    console.log("validator", validator);
-
-    // if (!validator) {
-    //   return new NextResponse('Invalid signature', { status: 401 });
-    // }
+    if (!validator) {
+      return new NextResponse('Invalid signature', { status: 401 });
+    }
 
     const message = body.Body.toString();
     const from = body.From.toString();
@@ -57,10 +39,6 @@ export async function POST(request: Request) {
 
     // Auto-respond (optional)
     // if (message.toLowerCase().includes('hello')) {
-    const twilioClient = twilio(
-      process.env.TWILIO_ACCOUNT_SID,
-      process.env.TWILIO_AUTH_TOKEN
-    );
 
     await twilioClient.messages.create({
       body: `Hey${profileName ? ` ${profileName}` : ''}, I'm a lil busy rn, but I'll get back to you asap!`,
@@ -73,7 +51,6 @@ export async function POST(request: Request) {
       from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
       to: from
     });
-    // }
 
     return new NextResponse('<Response><Message>✅</Message></Response>', {
       headers: { 'Content-Type': 'text/xml' },
