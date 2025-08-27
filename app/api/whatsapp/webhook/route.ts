@@ -33,8 +33,9 @@ export async function POST(request: Request) {
     }
 
     const message = body.Body.toString();
-    const from = body.From.toString().replace("whatsapp:", "");
+    const from = body.From.toString();
     const profileName = body.ProfileName.toString();
+    const fromNumber = from.replace("whatsapp:", "");
 
     // Here you can process the incoming message
     console.log(`Received message from ${from}: ${message}`);
