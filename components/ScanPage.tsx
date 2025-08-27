@@ -22,8 +22,8 @@ const ScanPage = () => {
           width: 256,
           margin: 0,
           color: {
-            dark: "#000000",
-            light: "#FFFFFF",
+            dark: "#8BDDEB",
+            light: "#232820",
           },
         });
         setQrCodeUrl(qrUrl);
@@ -66,7 +66,7 @@ const ScanPage = () => {
               {/* QR Code */}
               {qrCodeUrl && (
                 <div className="flex justify-center">
-                  <div className="p-4 bg-white rounded-lg border border-border/20">
+                  <div className="p-4 bg-background/40 backdrop-blur-sm rounded-lg border border-border/20">
                     <img
                       src={qrCodeUrl}
                       alt="QR Code"
