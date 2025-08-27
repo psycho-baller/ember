@@ -50,9 +50,9 @@ export async function POST(request: Request) {
     // });
 
     await twilioClient.messages.create({
-      body: `hey${profileName ? ` ${firstName}` : ''}, I'm Ember, UCalgary's superconnector.
+      body: `hey${profileName ? ` ${firstName}` : ''} i'm Ember, UCalgary's AI superconnector.
 
-I help you find exactly who you're looking for. A friend. A community. A group project buddy. A mentor. And even a life partner.
+I help you find exactly who you're looking for. Whether that's a friend, a club, a group project partner, a mentor, or even your next date😏
 
 Here's how it works:
 
