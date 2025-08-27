@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import twilio from 'twilio';
+import { validateRequest, twiml as Twiml } from 'twilio';
 
 export async function POST(request: Request) {
   try {
@@ -23,8 +24,7 @@ export async function POST(request: Request) {
     console.log("body", body);
 
     // Validate the request is from Twilio
-    const client = twilio(process.env.TWILIO_ACCOUNT_SID);
-    const validator = twilio.validateRequest(
+    const validator = validateRequest(
       process.env.TWILIO_AUTH_TOKEN!,
       twilioSignature || '',
       betterUrl,
