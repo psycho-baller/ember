@@ -1,7 +1,5 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import PhoneNumberForm from "@/components/phone-number-form";
-import PhoneButton from "@/components/secondary-button-link/phone-button";
 import WhatsAppButton from "@/components/WhatsAppButton";
 
 export default async function ProfilePage() {
@@ -13,15 +11,6 @@ export default async function ProfilePage() {
     redirect("/");
   }
   const claims = data.claims;
-
-  // Get user profile with phone number
-  const { data: profile, error: profileError } = await supabase
-    .from("profiles")
-    .select("phone_number")
-    .eq("id", claims.sub)
-    .single();
-
-  const hasPhoneNumber = !!profile?.phone_number;
 
   return (
     <div className="w-full max-w-md px-4">
