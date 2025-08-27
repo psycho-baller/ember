@@ -2,6 +2,7 @@
 
 import { Button } from './ui/button';
 import { MessageCircle } from 'lucide-react';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 export default function WhatsAppButton({ phoneNumber = '1234567890', message = 'Hello!' }) {
@@ -25,6 +26,7 @@ export default function WhatsAppButton({ phoneNumber = '1234567890', message = '
   const buttonUrl = isMobile ? whatsappUrl : scanUrl;
 
   return (
+    <>
     <Button
       asChild
       className="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-full flex items-center gap-2 shadow-lg transition-all hover:scale-105"
@@ -34,5 +36,9 @@ export default function WhatsAppButton({ phoneNumber = '1234567890', message = '
         Chat with me on WhatsApp!
       </a>
     </Button>
+    <p className="text-xs text-muted-foreground mt-2 text-center">
+      By chatting with me, you agree to our <Link href="/terms" target="_blank" className="underline">Terms of Service</Link>
+    </p>
+    </>
   );
 }

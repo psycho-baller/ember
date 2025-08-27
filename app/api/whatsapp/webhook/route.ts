@@ -52,7 +52,7 @@ export async function POST(request: Request) {
     });
 
     await twilioClient.messages.create({
-      body: "In the meantime, make sure you confirm your ucalgary email with the link sent to you",
+      body: "In the meantime, make sure you confirm your ucalgary email with the link I sent you",
       from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
       to: from
     });
