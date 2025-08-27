@@ -39,18 +39,24 @@ export async function POST(request: Request) {
     console.log(`Received message from ${from}: ${message}`);
 
     // Auto-respond (optional)
-    if (message.toLowerCase().includes('hello')) {
-      const twilioClient = twilio(
-        process.env.TWILIO_ACCOUNT_SID,
-        process.env.TWILIO_AUTH_TOKEN
-      );
+    // if (message.toLowerCase().includes('hello')) {
+    const twilioClient = twilio(
+      process.env.TWILIO_ACCOUNT_SID,
+      process.env.TWILIO_AUTH_TOKEN
+    );
 
-      await twilioClient.messages.create({
-        body: `Hey${profileName ? ` ${profileName}` : ''}, I'm a lil busy rn, but I'll get back to you asap!`,
-        from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
-        to: from
-      });
-    }
+    await twilioClient.messages.create({
+      body: `Hey${profileName ? ` ${profileName}` : ''}, I'm a lil busy rn, but I'll get back to you asap!`,
+      from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
+      to: from
+    });
+
+    await twilioClient.messages.create({
+      body: "In the meantime, make sure you confirm your ucalgary email with the link sent to you",
+      from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
+      to: from
+    });
+    // }
 
     return new NextResponse('<Response></Response>', {
       headers: { 'Content-Type': 'text/xml' },
