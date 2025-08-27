@@ -42,19 +42,39 @@ export async function POST(request: Request) {
 
     const [firstName, lastName] = profileName.split(" ");
 
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    await twilioClient.messages.create({
-      body: `Hey${profileName ? ` ${profileName}` : ''}, I'm a lil busy rn, but I'll get back to you asap!`,
-      from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
-      to: from
-    });
-
     await new Promise((resolve) => setTimeout(resolve, 1000));
     // await twilioClient.messages.create({
-    //   body: "In the meantime, make sure you confirm your ucalgary email with the link I sent you",
+    //   body: `Hey${profileName ? ` ${profileName}` : ''}, I'm a lil busy rn, but I'll get back to you asap!`,
     //   from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
     //   to: from
     // });
+
+    await twilioClient.messages.create({
+      body: `Hey${profileName ? ` ${firstName}` : ''}, I'm Ember, UCalgary's superconnector.
+
+I help you find exactly who you're looking for. A friend. A community. A group project buddy. A mentor. And even a life partner.
+
+Here's how it works:
+
+1. We chat or call (yes, you can call me😉) so I get to know you a lil more and who you're hoping to meet.
+2. I build a connection profile that reflects who you are and who you want to meet.
+3. Then I find someone on campus who matches that vibe and fits your schedule (a.k.a we'll try to match you with someone who's in your class, or who goes to the same lunch area as you)
+4. I share your profiles (only if you both approve), and set up a group chat so y'all can chat and hopefully meet up`,
+      from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
+      to: from
+    });
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await twilioClient.messages.create({
+      body: "while I still can't text, in the meantime feel free to call me. I'd love to get to know you more over the phone",
+      from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
+      to: from
+    });
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await twilioClient.messages.create({
+      body: "oh and also make sure you confirm your ucalgary email with the link I sent you",
+      from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
+      to: from
+    });
 
     // return new NextResponse('<Response><Message>✅</Message></Response>', {
     //   headers: { 'Content-Type': 'text/xml' },
@@ -72,7 +92,7 @@ export async function POST(request: Request) {
     //   return NextResponse.json({ success: true, response: shared.aiResponse });
     // }
 
-    return new NextResponse('<Response><Message>In the meantime, make sure you confirm your ucalgary email with the link I sent you</Message></Response>', {
+    return new NextResponse("<Response><Message>oh and also make sure you confirm your ucalgary email with the link I sent you</Message></Response>", {
       headers: { 'Content-Type': 'text/xml' },
     });
   } catch (err) {
