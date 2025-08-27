@@ -51,7 +51,8 @@ export async function updateSession(request: NextRequest) {
   const publicRoutes = [
     "/",
     "/scan",
-    "/terms"
+    "/terms",
+    "/api/whatsapp"
   ];
 
   // Check if the current path is a public route
