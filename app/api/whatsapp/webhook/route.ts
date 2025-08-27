@@ -46,7 +46,7 @@ export async function POST(request: Request) {
       );
 
       await twilioClient.messages.create({
-        body: 'Hello! Thanks for your message. How can I assist you today?',
+        body: `Hey${profileName ? ` ${profileName}` : ''}, I'm a lil busy rn, but I'll get back to you asap!`,
         from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
         to: from
       });
