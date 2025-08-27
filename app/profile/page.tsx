@@ -30,21 +30,6 @@ export default async function ProfilePage() {
           Ready to find your people?
         </h1>
 
-        {hasPhoneNumber ? (
-          <>
-            <p className="text-muted-foreground mb-8">
-              Call us at: <span className="font-mono">{process.env.TWILIO_PHONE_NUMBER}</span>
-            </p>
-            <div className="flex justify-center">
-              <PhoneButton
-                phoneNumber={process.env.TWILIO_PHONE_NUMBER!}
-                className="text-lg py-6 px-8 w-full max-w-xs"
-              >
-                Call Ember
-              </PhoneButton>
-            </div>
-          </>
-        ) : (
           <div className="text-left">
             <p className="text-muted-foreground mb-6">
               I&apos;m excited to get to know you more! Let&apos;s chat on WhatsApp
@@ -54,7 +39,6 @@ export default async function ProfilePage() {
               message="hey what's all this about?"
             />
           </div>
-        )}
       </div>
     </div>
   );
