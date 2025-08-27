@@ -3,11 +3,12 @@ import { useEffect, useState } from "react";
 import QRCode from "qrcode";
 import { Card, CardContent } from "@/components/ui/card";
 import FloatingBlobs from "@/components/landing/FloatingBlobs";
-import { ExternalLink, QrCode } from "lucide-react";
+import { ExternalLink, MessageCircle, QrCode } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Button } from "./ui/button";
+import Chat from "twilio/lib/rest/Chat";
 
 const ScanPage = () => {
   const searchParams = useSearchParams();
@@ -93,14 +94,10 @@ const ScanPage = () => {
                 href={url}
                 target="_blank"
               > */}
-                <ExternalLink className="w-4 h-4 mr-2" />
-                Open Link
+                <MessageCircle className="w-4 h-4" />
+                Open WhatsApp Web
               {/* </Link> */}
               </Button>
-              {/* URL Display */}
-              <p className="text-xs text-muted-foreground break-all px-2">
-                This will open WhatsApp Web
-              </p>
             </div>
           </div>
         </div>
