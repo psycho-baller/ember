@@ -47,7 +47,7 @@ export default async function ProfilePage() {
         ) : (
           <div className="text-left">
             <p className="text-muted-foreground mb-6">
-              I&apos;m excited to get to know you more! Let's chat on WhatsApp
+              I&apos;m excited to get to know you more! Let&apos;s chat on WhatsApp
             </p>
             <WhatsAppButton
               phoneNumber={process.env.NEXT_PUBLIC_TWILIO_PHONE_NUMBER!}
