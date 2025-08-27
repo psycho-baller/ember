@@ -9,7 +9,13 @@ export async function POST(request: Request) {
 
     // Initialize Twilio client
     const twilioSignature = request.headers.get('x-twilio-signature');
+    // 2) Reconstruct the EXACT public URL Twilio hit (don’t use req.url if behind proxy)
+    const host = request.headers.get("x-forwarded-host") || request.headers.get("host");
+    const proto = request.headers.get("x-forwarded-proto") || "https";
+    const betterUrl = `${proto}://${host}/api/whatsapp/webhook`;
+    console.log("betterUrl", betterUrl);
     const url = new URL(request.url);
+    console.log("url", url);
     const fullUrl = `${process.env.APP_URL}${url.pathname}`;
 
     console.log("fullUrl", fullUrl);
@@ -21,15 +27,15 @@ export async function POST(request: Request) {
     const validator = twilio.validateRequest(
       process.env.TWILIO_AUTH_TOKEN!,
       twilioSignature || '',
-      fullUrl,
+      betterUrl,
       body
     );
 
     console.log("validator", validator);
 
-    // if (!validator) {
-    //   return new NextResponse('Invalid signature', { status: 401 });
-    // }
+    if (!validator) {
+      return new NextResponse('Invalid signature', { status: 401 });
+    }
 
     const message = body.Body.toString();
     const from = body.From.toString();
@@ -58,7 +64,7 @@ export async function POST(request: Request) {
     });
     // }
 
-    return new NextResponse('<Response></Response>', {
+    return new NextResponse('<Response><Message>✅</Message></Response>', {
       headers: { 'Content-Type': 'text/xml' },
     });
   } catch (error) {
