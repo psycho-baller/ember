@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { validateRequest } from 'twilio';
 import { twilioClient } from '@/lib/twilio';
-import { SharedStore } from '@/lib/pocketflow/types';
-import { createAgentFlow } from '@/lib/pocketflow/flow';
+// import { SharedStore } from '@/lib/pocketflow/types';
+// import { createAgentFlow } from '@/lib/pocketflow/flow';
 
 export async function POST(request: Request) {
   try {
@@ -39,9 +39,6 @@ export async function POST(request: Request) {
     // Here you can process the incoming message
     console.log(`Received message from ${from}: ${message}`);
 
-    // Auto-respond (optional)
-    // if (message.toLowerCase().includes('hello')) {
-
     const [firstName, lastName] = profileName.split(" ");
 
     await new Promise((resolve) => setTimeout(resolve, 1500));
@@ -51,12 +48,12 @@ export async function POST(request: Request) {
       to: from
     });
 
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    await twilioClient.messages.create({
-      body: "In the meantime, make sure you confirm your ucalgary email with the link I sent you",
-      from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
-      to: from
-    });
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    // await twilioClient.messages.create({
+    //   body: "In the meantime, make sure you confirm your ucalgary email with the link I sent you",
+    //   from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
+    //   to: from
+    // });
 
     // return new NextResponse('<Response><Message>✅</Message></Response>', {
     //   headers: { 'Content-Type': 'text/xml' },
@@ -74,7 +71,7 @@ export async function POST(request: Request) {
     //   return NextResponse.json({ success: true, response: shared.aiResponse });
     // }
 
-    return new NextResponse('<Response></Response>', {
+    return new NextResponse('<Response><Message>In the meantime, make sure you confirm your ucalgary email with the link I sent you</Message></Response>', {
       headers: { 'Content-Type': 'text/xml' },
     });
   } catch (err) {
