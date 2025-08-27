@@ -32,11 +32,11 @@ export default async function ProfilePage() {
         {hasPhoneNumber ? (
           <>
             <p className="text-muted-foreground mb-8">
-              Call us at: <span className="font-mono">{process.env.VAPI_PHONE_NUMBER}</span>
+              Call us at: <span className="font-mono">{process.env.TWILIO_PHONE_NUMBER}</span>
             </p>
             <div className="flex justify-center">
               <PhoneButton
-                phoneNumber={process.env.VAPI_PHONE_NUMBER!}
+                phoneNumber={process.env.TWILIO_PHONE_NUMBER!}
                 className="text-lg py-6 px-8 w-full max-w-xs"
               >
                 Call Ember
