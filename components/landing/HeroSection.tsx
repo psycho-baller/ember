@@ -123,11 +123,11 @@ const HeroSection = () => {
             transition={{ duration: 0.5 }}
           >
             <div className="text-center space-y-4">
-              <h3 className="text-lg font-medium mb-2">🎉 Thanks for joining!</h3>
+              <h3 className="text-lg font-medium mb-2">🎉 Welcome to the Ember network!</h3>
               <p className="text-sm text-muted-foreground mb-4">
-                Click below to chat with us on WhatsApp and get started right away!
+                Let&apos;s chat on WhatsApp and get to know each other right away!
               </p>
-              <div className="flex justify-center">
+              <div className="flex justify-center flex-col">
                 <WhatsAppButton
                   phoneNumber={process.env.NEXT_PUBLIC_TWILIO_PHONE_NUMBER!}
                   message="hey what's all this about?"
