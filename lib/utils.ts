@@ -1,6 +1,7 @@
 import { cva } from "class-variance-authority";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import stringSimilarity from "string-similarity";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -95,3 +96,16 @@ export const headerRoutes = [
   //   path: siteConfig.links.kofi,
   // },
 ] as const
+
+export function pickBestEmail(firstName: string, candidates: string[]): string | null {
+  if (candidates.length === 0) return null;
+
+
+  const expectedPrefix = `${firstName.toLowerCase()}.`;
+  const ratings = stringSimilarity.findBestMatch(
+    expectedPrefix,
+    candidates.map((e) => e.split("@")[0])
+  );
+  const bestIdx = ratings.bestMatchIndex;
+  return candidates[bestIdx];
+}
