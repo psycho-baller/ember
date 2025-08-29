@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { validateRequest } from 'twilio';
 import { twilioClient } from '@/lib/twilio';
-// import { SharedStore } from '@/lib/pocketflow/types';
-// import { createAgentFlow } from '@/lib/pocketflow/flow';
+import { SharedStore } from '@/lib/pocketflow/types';
+import { createAgentFlow } from '@/lib/pocketflow/flow';
 
 export async function POST(request: Request) {
   try {
@@ -42,15 +42,16 @@ export async function POST(request: Request) {
 
     const [firstName, lastName] = profileName.split(" ");
 
-    await new Promise((resolve) => setTimeout(resolve, 2000));
     // await twilioClient.messages.create({
     //   body: `Hey${profileName ? ` ${profileName}` : ''}, I'm a lil busy rn, but I'll get back to you asap!`,
     //   from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
     //   to: from
     // });
 
-    await twilioClient.messages.create({
-      body: `hey${profileName ? ` ${firstName}` : ''} i'm Ember, UCalgary's AI superconnector.
+    if (message === "hey what's all this about?") {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await twilioClient.messages.create({
+        body: `hey${profileName ? ` ${firstName}` : ''} i'm Ember, UCalgary's AI superconnector.
 
 I help you find exactly who you're looking for. Whether that's a friend, a club, a group project partner, a mentor, or even your next date😏
 
@@ -60,37 +61,40 @@ Here's how it works:
 2. I build a connection profile that reflects who you are and who you want to meet.
 3. Then I find someone on campus who matches that vibe and fits your schedule (a.k.a we'll try to match you with someone who's in your class, or who goes to the same lunch area as you)
 4. I share your profiles (only if you both approve), and set up a group chat so y'all can chat and hopefully meet up`,
-      from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
-      to: from
-    });
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    await twilioClient.messages.create({
-      body: "while I still can't text, in the meantime feel free to call me. I'd love to get to know you more over the phone",
-      from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
-      to: from
-    });
-    await new Promise((resolve) => setTimeout(resolve, 5000));
+        from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
+        to: from
+      });
+      return new NextResponse("<Response><Message>oh and also make sure you confirm your ucalgary email with the link I sent you</Message></Response>", {
+        headers: { 'Content-Type': 'text/xml' },
+      });
+    }
+
+    const shared: SharedStore = {
+      user: { phone: from, firstName },
+      incomingMessage: message,
+    };
+
+    const flow = createAgentFlow();
+    await flow.run(shared);
+
+    if (shared.aiResponse) {
+      return new NextResponse("<Response><Message>" + shared.aiResponse + "</Message></Response>", {
+        headers: { 'Content-Type': 'text/xml' },
+      });
+    }
+
+    // await new Promise((resolve) => setTimeout(resolve, 2000));
+    // await twilioClient.messages.create({
+    //   body: "while I still can't text, in the meantime feel free to call me. I'd love to get to know you more over the phone",
+    //   from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
+    //   to: from
+    // });
+    // await new Promise((resolve) => setTimeout(resolve, 5000));
     // await twilioClient.messages.create({
     //   body: "oh and also make sure you confirm your ucalgary email with the link I sent you",
     //   from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
     //   to: from
     // });
-
-    // return new NextResponse('<Response><Message>✅</Message></Response>', {
-    //   headers: { 'Content-Type': 'text/xml' },
-    // });
-
-    // const shared: SharedStore = {
-    //   user: { phone: from, firstName },
-    //   incomingMessage: message,
-    // };
-
-    // const flow = createAgentFlow();
-    // await flow.run(shared);
-
-    // if (shared.aiResponse) {
-    //   return NextResponse.json({ success: true, response: shared.aiResponse });
-    // }
 
     return new NextResponse("<Response><Message>oh and also make sure you confirm your ucalgary email with the link I sent you</Message></Response>", {
       headers: { 'Content-Type': 'text/xml' },
