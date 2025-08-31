@@ -52,7 +52,7 @@ export async function runSessionedFlow(args: {
 
   // Initialize defaults
   shared.user = shared.user || {};
-
+  shared.messages = shared.messages || [];
 
   // Normalize and set inputs
   shared.user.phone = fromPhone.replace(/^whatsapp:/, "");
