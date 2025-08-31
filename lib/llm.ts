@@ -1,6 +1,6 @@
 import { OpenAI } from 'openai'
 import { openai } from "@ai-sdk/openai"
-import { generateText } from "ai"
+import { generateText, LanguageModel, ModelMessage } from "ai"
 import { DEFAULT_SYSTEM_PROMPT } from './prompts'
 export async function callBasicLlm(prompt: string): Promise<string> {
   const apiKey = process.env.OPENAI_API_KEY
@@ -17,16 +17,16 @@ export async function callBasicLlm(prompt: string): Promise<string> {
   return r.choices[0].message.content || ''
 }
 
-export async function callLlm(prompt: string, system: string = DEFAULT_SYSTEM_PROMPT): Promise<string> {
+export async function callLlm(messages: ModelMessage[] = [], system: string = DEFAULT_SYSTEM_PROMPT, model: LanguageModel = openai('gpt-4o-mini')): Promise<string> {
   const apiKey = process.env.OPENAI_API_KEY
 
   if (!apiKey) {
     throw new Error('OPENAI_API_KEY environment variable is not set')
   }
   const { text } = await generateText({
-    model: openai("gpt-4o-mini"),
+    model,
     system,
-    messages: [{ role: 'user', content: prompt }],
+    messages,
   })
   return text
 }

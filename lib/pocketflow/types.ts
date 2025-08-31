@@ -1,3 +1,5 @@
+import { ModelMessage } from "ai";
+
 export interface SharedStore {
   user: {
     phone?: string;
@@ -8,7 +10,7 @@ export interface SharedStore {
   incomingMessage?: string;
   aiResponse?: string;
   confirmationCompleted?: boolean;
-  // internal, ephemeral
   suggestedEmail?: string;
   awaitingEmail?: boolean;
+  messages: ModelMessage[];
 }
