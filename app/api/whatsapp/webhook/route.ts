@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
 import { validateRequest } from 'twilio';
 import { twilioClient } from '@/lib/twilio';
-import { SharedStore } from '@/lib/pocketflow/types';
-import { createAgentFlow } from '@/lib/pocketflow/flow';
+import { runSessionedFlow } from '@/lib/pocketflow/flow';
 
 export async function POST(request: Request) {
   try {
@@ -11,7 +10,6 @@ export async function POST(request: Request) {
     const body = Object.fromEntries(
       formData.entries()
     );
-
 
     // Initialize Twilio client
     const twilioSignature = request.headers.get('x-twilio-signature');
@@ -69,19 +67,15 @@ Here's how it works:
       });
     }
 
-    const shared: SharedStore = {
-      user: { phone: from, firstName },
-      incomingMessage: message,
-    };
+    const flow = await runSessionedFlow({
+      sessionId: fromNumber,
+      fromPhone: fromNumber,
+      message,
+      profileName,
+    });
 
-    const flow = createAgentFlow();
-    await flow.run(shared);
+    console.log(flow);
 
-    if (shared.aiResponse) {
-      return new NextResponse("<Response><Message>" + shared.aiResponse + "</Message></Response>", {
-        headers: { 'Content-Type': 'text/xml' },
-      });
-    }
 
     // await new Promise((resolve) => setTimeout(resolve, 2000));
     // await twilioClient.messages.create({
@@ -96,7 +90,7 @@ Here's how it works:
     //   to: from
     // });
 
-    return new NextResponse("<Response><Message>oh and also make sure you confirm your ucalgary email with the link I sent you</Message></Response>", {
+    return new NextResponse(`<Response><Message>${flow.aiResponse}</Message></Response>`, {
       headers: { 'Content-Type': 'text/xml' },
     });
   } catch (err) {
