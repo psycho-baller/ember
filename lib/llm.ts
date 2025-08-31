@@ -21,7 +21,7 @@ export async function callLlm(prompt: string, system: string = DEFAULT_SYSTEM_PR
   const apiKey = process.env.OPENAI_API_KEY
 
   if (!apiKey) {
-    return await callBasicLlm(prompt)
+    throw new Error('OPENAI_API_KEY environment variable is not set')
   }
   const { text } = await generateText({
     model: openai("gpt-4o-mini"),
