@@ -2,10 +2,13 @@ export interface SharedStore {
   user: {
     phone?: string;
     firstName?: string;
+    lastName?: string;
     email?: string;
-    profileId?: string;
   };
   incomingMessage?: string;
   aiResponse?: string;
-  confirmationSent?: boolean;
+  confirmationCompleted?: boolean;
+  // internal, ephemeral
+  suggestedEmail?: string;
+  awaitingEmail?: boolean;
 }

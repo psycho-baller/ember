@@ -2,6 +2,8 @@ import { cva } from "class-variance-authority";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import stringSimilarity from "string-similarity";
+import { NextResponse } from "next/server";
+import TwiML from "twilio/lib/twiml/TwiML";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -108,4 +110,66 @@ export function pickBestEmail(firstName: string, candidates: string[]): string |
   );
   const bestIdx = ratings.bestMatchIndex;
   return candidates[bestIdx];
+}
+
+export function looksLikeEmail(s?: string) {
+  return !!s?.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/i);
+}
+
+const YES = new Set(["yes", "y", "yeah", "yup", "sure", "confirm", "correct"]);
+const NO = new Set(["no", "n", "nope", "nah", "incorrect"]);
+
+function normalize(text: string): string {
+  return text.trim().toLowerCase().replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, "");
+}
+
+
+export function isYes(text: string): boolean {
+  return YES.has(normalize(text));
+}
+
+
+export function isNo(text: string): boolean {
+  return NO.has(normalize(text));
+}
+
+
+export function isEmail(text: string): boolean {
+  if (!text) return false;
+  if (text.length > 254) return false;
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
+  return re.test(text.trim());
+}
+
+
+export function inferFirstName(profileName?: string): string | undefined {
+  if (!profileName) return undefined;
+  const token = profileName.split(/\s+/)[0];
+  if (/^[A-Za-z][A-Za-z'-]{1,30}$/.test(token)) return token;
+  return undefined;
+}
+
+
+export function sessionIdFromPhone(from: string): string {
+  return `wa:${from}`; // stable id
+}
+
+
+export function prompt(msg: string): NextResponse {
+  const twiml = new (TwiML as any).MessagingResponse();
+  twiml.message(msg);
+  return new NextResponse(twiml.toString(), {
+    headers: { "Content-Type": "text/xml" },
+  });
+}
+
+export const emailRe = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/;
+export const yesRe = /^(y|ya|yes|yup|yeah|ok|okay|sure|confirm|correct|affirmative)\b/i;
+export const noRe = /^(n|no|nope|nah)\b/i;
+
+
+export function extractEmail(text?: string): string | null {
+  if (!text) return null;
+  const m = text.match(emailRe);
+  return m ? m[0] : null;
 }

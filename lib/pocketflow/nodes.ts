@@ -1,86 +1,255 @@
-import { Node } from "pocketflow";
+// nodes.ts
+import { Flow, Node } from "pocketflow";
 import { SharedStore } from "./types";
-import { fetchCandidateEmails, getUserIdByEmail, linkPhoneToProfile } from "../supabase/queries";
 import { sendWhatsAppMessage } from "../twilio";
 import { callLlm } from "../llm";
-import { pickBestEmail } from "../utils";
+import { emailRe, extractEmail, isYes, looksLikeEmail, noRe, pickBestEmail, yesRe } from "../utils";
+import { fetchCandidateEmails, getUserIdByEmail, linkPhoneToProfile, loadSharedStore, saveSharedStore } from "../supabase/queries";
 
-export class ResolveEmailNode extends Node<SharedStore> {
-  async prep(s: SharedStore): Promise<string> { return s.user.firstName || ""; }
-  async exec(firstName: string): Promise<string | null> {
-    const candidates = await fetchCandidateEmails(firstName);
-    return pickBestEmail(firstName, candidates);
+// Simple, consistent logger for this module
+const log = (
+  node: string,
+  step: string,
+  data?: Record<string, unknown>
+) => {
+  try {
+    // Use debug so it can be filtered in prod
+    console.debug(`[${node}] ${step}`, data ?? {});
+  } catch (e) {
+    // Fallback if serialization fails for any reason
+    console.debug(`[${node}] ${step} (logging_failed)`, String(e));
   }
-  async post(s: SharedStore, _: string, email: string | null): Promise<string> {
-    if (!email) return "needs_confirmation";
-    s.user.email = email;
-    return "needs_confirmation";
-  }
-}
+};
 
-export class ConfirmEmailNode extends Node<SharedStore> {
-  async prep(s: SharedStore): Promise<[string, string]> {
-    return [s.user.phone || "", s.user.email || ""];
-  }
-  async exec([phone, email]: [string, string]): Promise<string> {
-    const msg = `We found your email as ${email}. Reply YES to confirm, or NO to correct.`;
-    await sendWhatsAppMessage(phone, msg);
-    return email;
-  }
-  async post(s: SharedStore): Promise<string> {
-    s.confirmationSent = true;
-    s.confirmationPending = true;   // enter waiting state
-    return "await_confirmation";
-  }
-}
+const truncate = (s: string, max = 200) =>
+  typeof s === "string" && s.length > max ? `${s.slice(0, max)}…` : s;
 
-// NEW: waits for the next inbound message and interprets it
-export class AwaitConfirmationNode extends Node<SharedStore> {
-  async prep(s: SharedStore): Promise<[string | undefined, string | undefined, boolean | undefined]> {
-    return [s.incomingMessage, s.user.email, s.confirmationPending];
+export class CheckConfirmationNode extends Node<SharedStore> {
+  async prep(shared: SharedStore): Promise<{
+    confirmed: boolean;
+    msg: string;
+    awaiting: boolean;
+  }> {
+    log("CheckConfirmationNode", "prep:start", {
+      confirmationCompleted: !!shared.confirmationCompleted,
+      incomingMessageLen: (shared.incomingMessage || "").length,
+      awaitingEmail: !!shared.awaitingEmail,
+    });
+    const res = {
+      confirmed: !!shared.confirmationCompleted,
+      msg: (shared.incomingMessage || "").trim(),
+      awaiting: !!shared.awaitingEmail,
+    };
+    log("CheckConfirmationNode", "prep:done", {
+      confirmed: res.confirmed,
+      msgPreview: truncate(res.msg, 120),
+      awaiting: res.awaiting,
+    });
+    return res;
   }
-  async exec([msg, email, pending]: [string | undefined, string | undefined, boolean | undefined]): Promise<"confirmed" | "rejected" | "ignore"> {
-    if (!pending || !msg) return "ignore";
-    const norm = msg.trim().toLowerCase();
-    if (["yes", "y", "confirm", "ok"].includes(norm)) return "confirmed";
-    if (["no", "n", "nope", "incorrect"].includes(norm)) return "rejected";
-    return "ignore"; // keep waiting until clear signal
-  }
-  async post(s: SharedStore, _: unknown, status: "confirmed" | "rejected" | "ignore"): Promise<string> {
-    if (status === "ignore") return "await_confirmation"; // re-enter this node
-    if (status === "rejected") {
-      s.confirmationPending = false;
-      s.user.email = undefined;
-      return "needs_resolution"; // send back to ResolveEmailNode or a “collect email” node
+
+  async exec({ confirmed, msg, awaiting }: { confirmed: boolean; msg: string; awaiting: boolean }): Promise<"confirmed" | "parse" | "ask"> {
+    log("CheckConfirmationNode", "exec:start", {
+      confirmed,
+      awaiting,
+      msgPreview: truncate(msg, 120),
+      hasEmail: emailRe.test(msg),
+      hasYes: yesRe.test(msg),
+    });
+    if (confirmed) {
+      log("CheckConfirmationNode", "exec:decision", { action: "confirmed" });
+      return "confirmed";
     }
-    // confirmed
-    s.confirmationPending = false;
-    return "bind_identity";
+    if (emailRe.test(msg) || yesRe.test(msg) || awaiting) {
+      log("CheckConfirmationNode", "exec:decision", { action: "parse" });
+      return "parse";
+    }
+    log("CheckConfirmationNode", "exec:decision", { action: "ask" });
+    return "ask";
+  }
+
+  async post(_: SharedStore, __: unknown, action: "confirmed" | "parse" | "ask"): Promise<string> {
+    log("CheckConfirmationNode", "post", { action });
+    return action;
   }
 }
 
-// NEW: after confirmation, bind phone to the user profile owning that email
-export class BindIdentityNode extends Node<SharedStore> {
-  async prep(s: SharedStore): Promise<[string | undefined, string | undefined]> {
-    return [s.user.email, s.user.phone];
+// Ask user to confirm or provide email; optionally suggest best guess
+export class AskForEmailNode extends Node<SharedStore> {
+  async prep(shared: SharedStore): Promise<{ firstName?: string }> {
+    const res = { firstName: shared.user?.firstName };
+    log("AskForEmailNode", "prep", { firstName: res.firstName });
+    return res;
   }
-  async exec([email, phone]: [string | undefined, string | undefined]): Promise<"bound" | "missing_data"> {
-    if (!email || !phone) return "missing_data";
-    const userId = await getUserIdByEmail(email);
-    if (!userId) return "missing_data";
-    await linkPhoneToProfile(userId, phone);
-    return "bound";
+
+  async exec({ firstName }: { firstName?: string }): Promise<{ suggestion?: string }> {
+    log("AskForEmailNode", "exec:start", { firstName });
+    if (!firstName) {
+      log("AskForEmailNode", "exec:decision", { suggestion: undefined });
+      return { suggestion: undefined };
+    }
+    const candidates = await fetchCandidateEmails(firstName);
+    log("AskForEmailNode", "exec:candidates", {
+      firstName,
+      count: Array.isArray(candidates) ? candidates.length : undefined,
+    });
+    const best = pickBestEmail(firstName, candidates);
+    log("AskForEmailNode", "exec:best", { best });
+    return { suggestion: best || undefined };
   }
-  async post(s: SharedStore, _: unknown, r: "bound" | "missing_data"): Promise<string> {
-    return r === "bound" ? "default" : "error";
+
+  async post(shared: SharedStore, _: unknown, { suggestion }: { suggestion?: string }): Promise<string> {
+    log("AskForEmailNode", "post:start", { suggestion });
+    shared.suggestedEmail = suggestion;
+    shared.awaitingEmail = true;
+
+    if (suggestion) {
+      shared.aiResponse = `To continue, confirm your email. Is it ${suggestion}? Reply 'y' to confirm or send the correct email.`;
+    } else {
+      shared.aiResponse = `To continue, send your email address.`;
+    }
+    log("AskForEmailNode", "post:done", {
+      awaitingEmail: shared.awaitingEmail,
+      suggestedEmail: shared.suggestedEmail,
+      aiResponsePreview: truncate(shared.aiResponse || "", 160),
+    });
+    return "await_reply"; // flow ends until next inbound message
   }
 }
 
-export class GenerateResponseNode extends Node<SharedStore> {
-  async prep(s: SharedStore): Promise<string> { return s.incomingMessage || ""; }
-  async exec(msg: string): Promise<string> { return await callLlm(msg); }
-  async post(s: SharedStore, _: string, resp: string): Promise<string> {
-    s.aiResponse = resp;
-    return "default";
+// Parse reply: yes -> accept suggestion; or extract an explicit email
+export class ParseEmailOrConfirmationNode extends Node<SharedStore> {
+  async prep(shared: SharedStore): Promise<{ msg: string; suggestion?: string }> {
+    const res = { msg: (shared.incomingMessage || "").trim(), suggestion: shared.suggestedEmail };
+    log("ParseEmailOrConfirmationNode", "prep", {
+      msgPreview: truncate(res.msg, 160),
+      suggestion: res.suggestion,
+    });
+    return res;
+  }
+
+  async exec({ msg, suggestion }: { msg: string; suggestion?: string }): Promise<{ action: "got_email" | "ask_again"; email?: string }> {
+    log("ParseEmailOrConfirmationNode", "exec:start", {
+      msgPreview: truncate(msg, 160),
+      suggestion,
+      hasYes: yesRe.test(msg),
+      hasNo: noRe.test(msg),
+      hasEmail: emailRe.test(msg),
+    });
+    if (yesRe.test(msg) && suggestion) {
+      log("ParseEmailOrConfirmationNode", "exec:decision", { action: "got_email", source: "yes+suggestion" });
+      return { action: "got_email", email: suggestion };
+    }
+    if (noRe.test(msg)) {
+      log("ParseEmailOrConfirmationNode", "exec:decision", { action: "ask_again", source: "no" });
+      return { action: "ask_again" };
+    }
+
+    const email = extractEmail(msg);
+    if (email) {
+      log("ParseEmailOrConfirmationNode", "exec:decision", { action: "got_email", source: "extracted", email });
+      return { action: "got_email", email };
+    }
+
+    log("ParseEmailOrConfirmationNode", "exec:decision", { action: "ask_again", source: "fallback" });
+    return { action: "ask_again" };
+  }
+
+  async post(shared: SharedStore, _: unknown, res: { action: "got_email" | "ask_again"; email?: string }): Promise<string> {
+    log("ParseEmailOrConfirmationNode", "post:start", res);
+    if (res.action === "got_email" && res.email) {
+      shared.user.email = res.email;
+      log("ParseEmailOrConfirmationNode", "post:got_email", { email: res.email });
+      return "got_email";
+    }
+
+    shared.aiResponse = `Please send a valid email address.`;
+    shared.awaitingEmail = true;
+    log("ParseEmailOrConfirmationNode", "post:ask_again", {
+      awaitingEmail: shared.awaitingEmail,
+      aiResponsePreview: truncate(shared.aiResponse || "", 160),
+    });
+    return "ask_again";
+  }
+}
+
+// Verify email exists and link phone; then mark confirmation complete
+export class VerifyAndLinkNode extends Node<SharedStore> {
+  async prep(shared: SharedStore): Promise<{ email?: string; phone?: string }> {
+    const res = { email: shared.user?.email, phone: shared.user?.phone };
+    log("VerifyAndLinkNode", "prep", { email: res.email, phone: res.phone });
+    return res;
+  }
+
+  async exec({ email, phone }: { email?: string; phone?: string }): Promise<{ ok: boolean; reason?: string }> {
+    log("VerifyAndLinkNode", "exec:start", { email, phone });
+    if (!email) {
+      log("VerifyAndLinkNode", "exec:decision", { ok: false, reason: "missing" });
+      return { ok: false, reason: "missing" };
+    }
+    const id = await getUserIdByEmail(email);
+    log("VerifyAndLinkNode", "exec:lookup", { email, found: !!id });
+    if (!id) {
+      log("VerifyAndLinkNode", "exec:decision", { ok: false, reason: "not_found" });
+      return { ok: false, reason: "not_found" };
+    }
+    const userId = await linkPhoneToProfile(email, phone || "");
+    if (!userId) {
+      log("VerifyAndLinkNode", "exec:decision", { ok: false, reason: "not_found" });
+      return { ok: false, reason: "not_found" };
+    }
+    log("VerifyAndLinkNode", "exec:linked", { email, phone: phone || "" });
+    return { ok: true };
+  }
+
+  async post(shared: SharedStore, _: unknown, res: { ok: boolean; reason?: string }): Promise<string> {
+    log("VerifyAndLinkNode", "post:start", res);
+    if (res.ok) {
+      shared.confirmationCompleted = true;
+      shared.awaitingEmail = false;
+      sendWhatsAppMessage(shared.user.phone!, "Your account has been successfully linked. We can now chat or call!");
+      log("VerifyAndLinkNode", "post:confirmed", {
+        confirmationCompleted: shared.confirmationCompleted,
+        awaitingEmail: shared.awaitingEmail,
+        aiResponsePreview: truncate(shared.aiResponse || "", 160),
+      });
+      return "confirmed";
+    }
+
+    if (res.reason === "not_found") {
+      sendWhatsAppMessage(shared.user.phone!, `That email is not recognized. Send a different email.`);
+    } else {
+      sendWhatsAppMessage(shared.user.phone!, `Please provide your email address to continue.`);
+    }
+    shared.awaitingEmail = true;
+    log("VerifyAndLinkNode", "post:ask_again", {
+      reason: res.reason,
+      awaitingEmail: shared.awaitingEmail,
+      aiResponsePreview: truncate(shared.aiResponse || "", 160),
+    });
+    return "ask_again";
+  }
+}
+
+// Open chat with the AI once confirmed
+export class ChatNode extends Node<SharedStore> {
+  async prep(shared: SharedStore): Promise<string> {
+    const msg = shared.incomingMessage || "";
+    log("ChatNode", "prep", { msgPreview: truncate(msg, 200), length: msg.length });
+    return msg;
+  }
+
+  async exec(userMsg: string): Promise<string> {
+    // Minimal prompt. Add more context if needed.
+    log("ChatNode", "exec:send", { msgPreview: truncate(userMsg, 200), length: userMsg.length });
+    const reply = await callLlm(userMsg);
+    log("ChatNode", "exec:reply", { replyPreview: truncate(reply, 200), length: reply.length });
+    return reply;
+  }
+
+  async post(shared: SharedStore, _: string, reply: string): Promise<string | undefined> {
+    shared.aiResponse = reply;
+    log("ChatNode", "post", { aiResponsePreview: truncate(reply, 200), length: reply.length });
+    return undefined; // end
   }
 }
