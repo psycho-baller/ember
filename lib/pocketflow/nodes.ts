@@ -5,6 +5,7 @@ import { sendWhatsAppMessage } from "../twilio";
 import { callLlm } from "../llm";
 import { emailRe, extractEmail, isYes, looksLikeEmail, noRe, pickBestEmail, yesRe } from "../utils";
 import { fetchCandidateEmails, getUserIdByEmail, linkPhoneToProfile, loadSharedStore, saveSharedStore } from "../supabase/queries";
+import { ModelMessage } from "ai";
 
 // Simple, consistent logger for this module
 const log = (
@@ -233,22 +234,28 @@ export class VerifyAndLinkNode extends Node<SharedStore> {
 
 // Open chat with the AI once confirmed
 export class ChatNode extends Node<SharedStore> {
-  async prep(shared: SharedStore): Promise<string> {
+  async prep(shared: SharedStore): Promise<ModelMessage[]> {
     const msg = shared.incomingMessage || "";
+    shared.messages.push({ role: "user", content: msg });
     log("ChatNode", "prep", { msgPreview: truncate(msg, 200), length: msg.length });
-    return msg;
+    return shared.messages;
   }
 
-  async exec(userMsg: string): Promise<string> {
+  async exec(messages: ModelMessage[]): Promise<string> {
     // Minimal prompt. Add more context if needed.
+    const userMsg = messages.at(-1)?.content as string;
+    if (!userMsg) {
+      throw new Error("No user message found");
+    }
     log("ChatNode", "exec:send", { msgPreview: truncate(userMsg, 200), length: userMsg.length });
-    const reply = await callLlm(userMsg);
+    const reply = await callLlm(messages);
     log("ChatNode", "exec:reply", { replyPreview: truncate(reply, 200), length: reply.length });
     return reply;
   }
 
   async post(shared: SharedStore, _: string, reply: string): Promise<string | undefined> {
     shared.aiResponse = reply;
+    shared.messages.push({ role: "assistant", content: reply });
     log("ChatNode", "post", { aiResponsePreview: truncate(reply, 200), length: reply.length });
     return undefined; // end
   }
