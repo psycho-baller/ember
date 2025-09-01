@@ -3,9 +3,9 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import stringSimilarity from "string-similarity";
 import { NextResponse } from "next/server";
-import TwiML from "twilio/lib/twiml/TwiML";
 import { SharedStore } from "./pocketflow/types";
 import { searchClubs } from "./supabase/queries";
+import MessagingResponse from "twilio/lib/twiml/MessagingResponse";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -158,7 +158,7 @@ export function sessionIdFromPhone(from: string): string {
 
 
 export function prompt(msg: string): NextResponse {
-  const twiml = new (TwiML as any).MessagingResponse();
+  const twiml = new MessagingResponse();
   twiml.message(msg);
   return new NextResponse(twiml.toString(), {
     headers: { "Content-Type": "text/xml" },
