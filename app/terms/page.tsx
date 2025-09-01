@@ -29,7 +29,7 @@ const TermsPage = () => {
           <ul className="space-y-3">
             <li className="flex">
               <span className="font-medium text-primary mr-2 text-nowrap">&quot;Service&quot;</span>
-              means Ember, the AI superconnector accessible at heyember.vercel.app.
+              means Ember, the AI superconnector accessible at heyember.me.
             </li>
             <li className="flex">
               <span className="font-medium text-primary mr-2 text-nowrap">&quot;User&quot;</span>
@@ -54,7 +54,7 @@ const TermsPage = () => {
 
         <section className="mb-12">
           <h2 className="text-2xl font-semibold mb-4 pb-2 border-b border-border">Registration and Account Activation</h2>
-          <p>To register, you provide a valid US or Canadian university email on heyember.vercel.app.</p>
+          <p>To register, you provide a valid US or Canadian university email on heyember.me.</p>
           <p>Your account is activated once you complete the initial chat session with Ember to establish your Connection Profile.</p>
         </section>
 
