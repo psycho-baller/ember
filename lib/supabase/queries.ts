@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ClubMatch, SharedStore } from "../pocketflow/types";
 import { embed } from "ai";
 import { openai } from "@ai-sdk/openai";
+import { log } from "console";
 
 export async function fetchCandidateEmails(firstName: string): Promise<string[]> {
   const supabase = await createClient();
@@ -91,6 +92,7 @@ export async function searchClubs(opts: {
     min_similarity: minSimilarity,
     keyword,
   });
+  log("searchClubs", { query, k, minSimilarity, keyword, data, error });
 
   if (error) {
     throw new Error(`match_clubs RPC failed: ${error.message}`);

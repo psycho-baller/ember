@@ -3,10 +3,13 @@ import { Flow, Node } from "pocketflow";
 import { SharedStore } from "./types";
 import { sendWhatsAppMessage } from "../twilio";
 import { callLlm } from "../llm";
-import { emailRe, extractEmail, isYes, looksLikeEmail, noRe, personalizeSystemPrompt, pickBestEmail, userInfo, yesRe } from "../utils";
-import { fetchCandidateEmails, getUserIdByEmail, linkPhoneToProfile, loadSharedStore, saveSharedStore } from "../supabase/queries";
+import { searchClubs } from "../supabase/queries";
+import { SUGGEST_CLUBS_PROMPT } from "../prompts";
+import { emailRe, extractEmail, isYes, looksLikeEmail, noRe, pickBestEmail, userInfo, yesRe } from "../utils";
+import { fetchCandidateEmails, getUserIdByEmail, linkPhoneToProfile, saveSharedStore } from "../supabase/queries";
 import { ModelMessage } from "ai";
 import { DEFAULT_SYSTEM_PROMPT } from "../prompts";
+import { isAskingAboutClubs } from "./utils";
 
 // Simple, consistent logger for this module
 const log = (
@@ -242,16 +245,58 @@ export class ChatNode extends Node<SharedStore> {
     return shared;
   }
 
+  private async handleClubRecommendations(userMsg: string, userPhone: string): Promise<void> {
+    if (!isAskingAboutClubs(userMsg)) {
+      log("ChatNode", "handleClubRecommendations", { userMsg, userPhone, isAskingAboutClubs: false });
+      return;
+    }
+
+    try {
+      // Get club matches first
+      const clubs = await searchClubs({ query: userMsg });
+      log("ChatNode", "handleClubRecommendations", { userMsg, userPhone, clubs });
+
+      // If we have matching clubs, generate and send recommendations
+      if (clubs.length > 0) {
+        const prompt = SUGGEST_CLUBS_PROMPT(userMsg, clubs);
+        const recommendations = await callLlm([{ role: 'user', content: prompt }]);
+        log("ChatNode", "handleClubRecommendations", { userMsg, userPhone, clubs, recommendations });
+
+        if (recommendations) {
+          log("ChatNode", "handleClubRecommendations", { userMsg, userPhone, clubs, recommendations });
+          // Send recommendations as a separate message
+          await sendWhatsAppMessage(userPhone, recommendations);
+        }
+      }
+    } catch (error) {
+      log("ChatNode", "handleClubRecommendations", { userMsg, userPhone, error });
+    }
+  }
+
   async exec(shared: SharedStore): Promise<string> {
-    // Minimal prompt. Add more context if needed.
     const userMsg = shared.messages.at(-1)?.content as string;
     if (!userMsg) {
       throw new Error("No user message found");
     }
+
     log("ChatNode", "exec:send", { msgPreview: truncate(userMsg, 200), length: userMsg.length });
-    const personalizedSystemPrompt = DEFAULT_SYSTEM_PROMPT + userInfo(shared) + await personalizeSystemPrompt(userMsg);
+
+    // Start club recommendations as a background task without awaiting it
+    if (shared.user.phone) {
+      this.handleClubRecommendations(userMsg, shared.user.phone).catch(error => {
+        log("ChatNode", "exec:handleClubRecommendations", { userMsg, userPhone: shared.user.phone, error });
+      });
+    }
+
+    // Generate main response
+    const personalizedSystemPrompt = DEFAULT_SYSTEM_PROMPT + userInfo(shared);
     const reply = await callLlm(shared.messages, personalizedSystemPrompt);
-    log("ChatNode", "exec:reply", { replyPreview: truncate(reply, 200), length: reply.length });
+
+    log("ChatNode", "exec:reply", {
+      replyPreview: truncate(reply, 200),
+      length: reply.length
+    });
+
     return reply;
   }
 

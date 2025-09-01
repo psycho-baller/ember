@@ -187,22 +187,3 @@ Here is some info on the student you are currently chatting with:
 
 Name: ${shared.user?.firstName} ${shared.user?.lastName}`;
 }
-
-/**
- * Get user
- * @param userMsg
- * @returns
- */
-export async function personalizeSystemPrompt(userMsg: string): Promise<string> {
-  const clubs = await searchClubs({ query: userMsg });
-  return `
-You are a precise campus club matchmaker.
-Rules:
-- Ground your answer STRICTLY in the provided clubs context.
-- Prefer clubs with higher similarity unless a lower-similarity club obviously matches user constraints.
-- If data is insufficient, say what is missing and ask a concise follow-up question.
-- Return a short ranked list with 1-5 best matches, each with a one-sentence rationale
-- Include the club URL with each recommendation.
-Clubs that the user might be interested in based on his message:
-${clubs.map((c) => `Name: ${c.name}, Similarity: ${c.similarity}, URL: ${c.url}`).join("\n")}`;
-}
