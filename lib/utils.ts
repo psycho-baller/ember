@@ -4,6 +4,8 @@ import { twMerge } from "tailwind-merge";
 import stringSimilarity from "string-similarity";
 import { NextResponse } from "next/server";
 import TwiML from "twilio/lib/twiml/TwiML";
+import { SharedStore } from "./pocketflow/types";
+import { searchClubs } from "./supabase/queries";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -172,4 +174,35 @@ export function extractEmail(text?: string): string | null {
   if (!text) return null;
   const m = text.match(emailRe);
   return m ? m[0] : null;
+}
+
+/**
+ * Prompt for the AI to provide more info on the user
+ * @param shared
+ * @returns
+ */
+export function userInfo(shared: SharedStore): string {
+  return `
+Here is some info on the student you are currently chatting with:
+
+Name: ${shared.user?.firstName} ${shared.user?.lastName}`;
+}
+
+/**
+ * Get user
+ * @param userMsg
+ * @returns
+ */
+export async function personalizeSystemPrompt(userMsg: string): Promise<string> {
+  const clubs = await searchClubs({ query: userMsg });
+  return `
+You are a precise campus club matchmaker.
+Rules:
+- Ground your answer STRICTLY in the provided clubs context.
+- Prefer clubs with higher similarity unless a lower-similarity club obviously matches user constraints.
+- If data is insufficient, say what is missing and ask a concise follow-up question.
+- Return a short ranked list with 1-5 best matches, each with a one-sentence rationale
+- Include the club URL with each recommendation.
+Clubs that the user might be interested in based on his message:
+${clubs.map((c) => `Name: ${c.name}, Similarity: ${c.similarity}, URL: ${c.url}`).join("\n")}`;
 }

@@ -14,3 +14,17 @@ export interface SharedStore {
   awaitingEmail?: boolean;
   messages: ModelMessage[];
 }
+
+
+export type Club = {
+  id: number;
+  name: string;
+  short_name: string | null;
+  description: string | null;
+  summary: string | null;
+  instagram: string | null;
+  discord: string | null;
+  url: string;
+};
+
+export type ClubMatch = Club & { similarity: number };

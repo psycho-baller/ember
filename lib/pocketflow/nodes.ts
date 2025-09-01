@@ -3,9 +3,10 @@ import { Flow, Node } from "pocketflow";
 import { SharedStore } from "./types";
 import { sendWhatsAppMessage } from "../twilio";
 import { callLlm } from "../llm";
-import { emailRe, extractEmail, isYes, looksLikeEmail, noRe, pickBestEmail, yesRe } from "../utils";
+import { emailRe, extractEmail, isYes, looksLikeEmail, noRe, personalizeSystemPrompt, pickBestEmail, userInfo, yesRe } from "../utils";
 import { fetchCandidateEmails, getUserIdByEmail, linkPhoneToProfile, loadSharedStore, saveSharedStore } from "../supabase/queries";
 import { ModelMessage } from "ai";
+import { DEFAULT_SYSTEM_PROMPT } from "../prompts";
 
 // Simple, consistent logger for this module
 const log = (
@@ -234,21 +235,22 @@ export class VerifyAndLinkNode extends Node<SharedStore> {
 
 // Open chat with the AI once confirmed
 export class ChatNode extends Node<SharedStore> {
-  async prep(shared: SharedStore): Promise<ModelMessage[]> {
+  async prep(shared: SharedStore): Promise<SharedStore> {
     const msg = shared.incomingMessage || "";
     shared.messages.push({ role: "user", content: msg });
     log("ChatNode", "prep", { msgPreview: truncate(msg, 200), length: msg.length });
-    return shared.messages;
+    return shared;
   }
 
-  async exec(messages: ModelMessage[]): Promise<string> {
+  async exec(shared: SharedStore): Promise<string> {
     // Minimal prompt. Add more context if needed.
-    const userMsg = messages.at(-1)?.content as string;
+    const userMsg = shared.messages.at(-1)?.content as string;
     if (!userMsg) {
       throw new Error("No user message found");
     }
     log("ChatNode", "exec:send", { msgPreview: truncate(userMsg, 200), length: userMsg.length });
-    const reply = await callLlm(messages);
+    const personalizedSystemPrompt = DEFAULT_SYSTEM_PROMPT + userInfo(shared) + await personalizeSystemPrompt(userMsg);
+    const reply = await callLlm(shared.messages, personalizedSystemPrompt);
     log("ChatNode", "exec:reply", { replyPreview: truncate(reply, 200), length: reply.length });
     return reply;
   }

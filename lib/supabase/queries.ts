@@ -1,5 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
-import { SharedStore } from "../pocketflow/types";
+import { ClubMatch, SharedStore } from "../pocketflow/types";
+import { embed } from "ai";
+import { openai } from "@ai-sdk/openai";
 
 export async function fetchCandidateEmails(firstName: string): Promise<string[]> {
   const supabase = await createClient();
@@ -55,4 +57,45 @@ export async function saveSharedStore(sessionId: string, shared: SharedStore, pr
     p_prev_version: prevVersion
   });
   if (error) throw error;
+}
+
+
+
+// ---- 1) Vector search: embed the query, call Supabase RPC, return matches ----
+/**
+ * searchClubs
+ * - Embeds the user query (text-embedding-3-small, 1536-d)
+ * - Calls Supabase RPC (match_clubs) to retrieve top-k similar clubs
+ * - Optional keyword prefilter via Postgres full-text (set keyword to narrow domain)
+ */
+export async function searchClubs(opts: {
+  query: string;
+  k?: number;                  // top-k, default 8
+  minSimilarity?: number;      // 0..1 cosine-based similarity threshold
+  keyword?: string | null;     // optional hybrid keyword filter
+}): Promise<ClubMatch[]> {
+  const supabase = await createClient();
+
+  const { query, k = 8, minSimilarity = 0.2, keyword = null } = opts;
+
+  // 1) Embed the query with Vercel AI SDK + OpenAI provider
+  const { embedding } = await embed({
+    model: openai.embedding('text-embedding-3-small'),
+    value: query,
+  });
+
+  // 2) Vector search via RPC
+  const { data, error } = await supabase.rpc('match_clubs', {
+    query_embedding: embedding,
+    match_count: k,
+    min_similarity: minSimilarity,
+    keyword,
+  });
+
+  if (error) {
+    throw new Error(`match_clubs RPC failed: ${error.message}`);
+  }
+
+  // Data already includes similarity; ensure typing
+  return (data ?? []) as ClubMatch[];
 }
