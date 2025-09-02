@@ -33,12 +33,12 @@ export function detectClubIntent(message: string): { match: boolean; score: numb
   // Social motivation
   const socialLex = /\b(meet (?:new )?people|make friends|sociali[sz]e|what to do|activities?)\b/;
   if (socialLex.test(text)) { score += 1; reasons.push("social_motive"); }
-  
+
   // Detect standalone sports/hobbies (e.g., "I love playing basketball")
-  const activityLex = /\b(i (?:love|like|enjoy|play|practice|do) (?:playing )?(?:\w+ing|\w+ball|soccer|basketball|volleyball|hockey|tennis|badminton|swimming|dancing|singing|acting|reading|writing|drawing|painting|photography|hiking|running|yoga|martial arts|chess|gaming|video games|esports))\b/;
+  const activityLex = /\b((?:playing )?(?:\w+ing|\w+ball|soccer|basketball|volleyball|hockey|tennis|badminton|swimming|dancing|singing|acting|reading|writing|drawing|painting|photography|hiking|running|yoga|martial arts|chess|gaming|video games|esports))\b/;
   if (activityLex.test(text)) { score += 2; reasons.push("activity_mentioned"); }
 
-  return { match: score >= 2, score, reasons };
+  return { match: score >= 1, score, reasons };
 }
 
 // Simple boolean wrapper (drop-in for your old method)
