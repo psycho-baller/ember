@@ -46,8 +46,8 @@ export async function POST(request: Request) {
     //   to: from
     // });
 
-    if (message === "hey what's all this about?") {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+    if (message.toLowerCase() === "hey what's all this about?") {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       await twilioClient.messages.create({
         body: `hey${firstName ? ` ${firstName}` : ''} i'm Ember, UCalgary's AI superconnector.
 
@@ -62,6 +62,7 @@ Here's how it works:
         from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
         to: from
       });
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       return new NextResponse("<Response><Message>oh and also make sure you confirm your ucalgary email with the link I sent you</Message></Response>", {
         headers: { 'Content-Type': 'text/xml' },
       });
