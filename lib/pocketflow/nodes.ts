@@ -2,11 +2,13 @@
 import { Flow, Node } from "pocketflow";
 import { SharedStore } from "./types";
 import { sendWhatsAppMessage } from "../twilio";
-import { callLlm } from "../llm";
+import { openai } from "@ai-sdk/openai";
 import { emailRe, extractEmail, noRe, pickBestEmail, userInfo, yesRe } from "../utils";
 import { fetchCandidateEmails, getUserIdByEmail, linkPhoneToProfile } from "../supabase/queries";
-import { DEFAULT_SYSTEM_PROMPT } from "../prompts";
-import { handleClubRecommendations } from "./utils";
+import { DEFAULT_SYSTEM_PROMPT, PERSONALIZED_SYSTEM_PROMPT } from "../prompts";
+import { clubRecommendationTool } from "./tools";
+import { generateText, stepCountIs } from "ai";
+// import { handleClubRecommendations } from "./utils"; // replaced by tool-enabled single chat
 
 // Simple, consistent logger for this module
 const log = (
@@ -250,23 +252,25 @@ export class ChatNode extends Node<SharedStore> {
 
     log("ChatNode", "exec:send", { msgPreview: truncate(userMsg, 200), length: userMsg.length });
 
-    // Start club recommendations as a background task without awaiting it
-    if (shared.user.phone) {
-      handleClubRecommendations(shared.messages, shared.user.phone).catch(error => {
-        log("ChatNode", "exec:handleClubRecommendations", { userMsg, userPhone: shared.user.phone, error });
-      });
-    }
-
-    // Generate main response
-    const personalizedSystemPrompt = DEFAULT_SYSTEM_PROMPT + userInfo(shared);
-    const reply = await callLlm(shared.messages, personalizedSystemPrompt);
-
-    log("ChatNode", "exec:reply", {
-      replyPreview: truncate(reply, 200),
-      length: reply.length
+    // Generate main response with tool-enabled chat (searchClubs)
+    const personalizedSystemPrompt = PERSONALIZED_SYSTEM_PROMPT(userMsg, shared);
+    const { text, toolCalls } = await generateText({
+      model: openai('gpt-4o'),
+      system: personalizedSystemPrompt,
+      messages: shared.messages.slice(-10),
+      tools: {
+        searchClubs: clubRecommendationTool,
+      },
+      stopWhen: stepCountIs(5)
     });
 
-    return reply;
+    log("ChatNode", "exec:reply", {
+      replyPreview: truncate(text, 200),
+      length: text.length,
+      toolCalls: toolCalls.length,
+    });
+
+    return text;
   }
 
   async post(shared: SharedStore, _: string, reply: string): Promise<string | undefined> {
