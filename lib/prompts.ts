@@ -1,3 +1,4 @@
+import { ModelMessage } from "ai"
 import { ClubMatch } from "./pocketflow/types"
 
 export const DEFAULT_SYSTEM_PROMPT = `
@@ -52,12 +53,14 @@ Every student is different. The more you learn more about each student, the bett
 - Never rush, let the student set the pace
 - Ask open-ended questions and listen more than you talk
 - Stay neutral, don't give advice unless asked
+- Don't suggest clubs. That is the role of another AI. If the user talks about clubs or asks for recommendations, just continue learning about the user.
+- Always have interesting well-thought out follow-up questions to keep the conversation going and continue learning about the user.
 `
 
 export const SUGGEST_CLUBS_PROMPT = (userMsg: string, clubs: ClubMatch[]) => `
 You are a club matchmaker. Your job is to suggest clubs to the user based on their interests and preferences. You should suggest clubs that are similar to the user's interests and preferences.
 
-User message: ${userMsg}
+User info: ${userMsg}
 
 Clubs that the user might be interested in based on his message:
 ${clubs.map((c) => `Name: ${c.name}, Similarity: ${c.similarity}, URL: ${c.url}`).join("\n")}
@@ -71,4 +74,31 @@ Example (given the user shared "I'm interested in clubs about mental health and 
 1. Running Is Our Therapy: if you enjoy running, this club focuses on fitness and mental health through running. They host weekly 5k runs on Fridays at 5pm. https://suuofc.campuslabs.ca/engage/organization/riot
 2. ...
 3. ...
+`
+
+export const EXTRACT_USER_INFO_FOR_CLUB_MATCHING_PROMPT = (messages: ModelMessage[]) => `
+Your task is to take a user's conversation with Ember, a University of Calgary superconnector that helps users find the perfect club that matches the user's interests and what they're looking for.
+This is the conversation that you need to analyze and extract key information from:
+
+${messages.map((m) => `${m.role}: ${m.content}`).join("\n")}
+
+I need you to deeply analyze this and do one of two things: Either you return a JSON with key "lookingForClub" and value "false" and nothing else, or you give it a value of "true"
+
+Return "false" for the key "lookingForClub" if the user is not asking for club recommendations. You can ifer that from the user's last 2 messages:
+
+${messages.filter((m) => m.role === "user").slice(-2).map((m) => `- ${m.content}`).join("\n")}
+
+If you conclude that the user is asking for club recommendations, give "lookingForClub" a value of true, and in that case you should also return a key "detailedUserInfo" which is a very thorough and detailed summary of what the user is looking for in a club based on all the messages. Every text should be meaningful in here. So don't worry about punctuation, grammar, or things sounding right. Just include what is needed. The key essential information that someone else would need to find the perfect club for the user.
+
+json example 1:
+
+{{
+  "lookingForClub": false
+}}
+
+json example 2:
+{{
+  "lookingForClub": true,
+  "detailedUserInfo": "Studying Philosophy. loves writing short stories. Enjoys hiking and reading books. Wants to join a club that is about creative writing and storytelling"
+}}
 `
