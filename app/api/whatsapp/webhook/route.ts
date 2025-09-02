@@ -49,16 +49,16 @@ export async function POST(request: Request) {
     if (message === "hey what's all this about?") {
       await new Promise((resolve) => setTimeout(resolve, 2000));
       await twilioClient.messages.create({
-        body: `hey${profileName ? ` ${firstName}` : ''} i'm Ember, UCalgary's AI superconnector.
+        body: `hey${firstName ? ` ${firstName}` : ''} i'm Ember, UCalgary's AI superconnector.
 
 I help you find exactly who you're looking for. Whether that's a friend, a club, a group project partner, a mentor, or even your next date😏
 
 Here's how it works:
 
-1. We chat or call (yes, you can call me😉) so I get to know you a lil more and who you're hoping to meet.
+1. We chat or call (yes, you can call me) so I get to know you a lil more and who you're hoping to meet.
 2. I build a connection profile that reflects who you are and who you want to meet.
 3. Then I find someone on campus who matches that vibe and fits your schedule (a.k.a we'll try to match you with someone who's in your class, or who goes to the same lunch area as you)
-4. I share your profiles (only if you both approve), and set up a group chat so y'all can chat and hopefully meet up`,
+4. I share your profiles (only if you both approve), and set up a group chat (through email because whatsapp doesn't allow me to do so😔) so y'all can chat and hopefully meet up`,
         from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
         to: from
       });
