@@ -62,7 +62,7 @@ const HeroSection = () => {
           <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
             {/* I bring you exactly who you&apos;re looking for at the */}
             {/* I go wherever you go to find you someone */}
-            I know everyone at your university😎. Let&apos;s chat and I&apos;ll connect you with exactly who you&apos;re looking for
+            Let&apos;s chat and I&apos;ll connect you with exactly who you&apos;re looking for. Whether it&apos;s friends, clubs, group project buddies, or even a life partner, I got you covered.
           </p>
         </div>
 
@@ -111,7 +111,7 @@ const HeroSection = () => {
                 )}
               </div>
               <p className="text-xs text-muted-foreground mt-2 text-center">
-                Enter your US or Canadian university email to get started.
+                Enter your University of Calgary email to get started
               </p>
             </form>
           </motion.div>
