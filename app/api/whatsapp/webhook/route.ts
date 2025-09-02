@@ -47,11 +47,11 @@ export async function POST(request: Request) {
     // });
 
     if (message.toLowerCase() === "hey what's all this about?") {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // await new Promise((resolve) => setTimeout(resolve, 1000));
       await twilioClient.messages.create({
         body: `hey${firstName ? ` ${firstName}` : ''} i'm Ember, UCalgary's AI superconnector.
 
-I help you find exactly who you're looking for. Whether that's a friend, a club, a group project partner, a mentor, or even your next date😏
+I help you find exactly who/what you're looking for. Whether that's a friend, a club, a group project partner, a mentor, or even your next date😏
 
 Here's how it works:
 
