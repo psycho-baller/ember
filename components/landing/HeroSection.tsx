@@ -85,7 +85,7 @@ const HeroSection = () => {
                 <div className="flex items-center bg-background/50 backdrop-blur-xs rounded-full border border-border/50 p-1">
                   <Input
                     type="email"
-                    placeholder="your@university.edu"
+                    placeholder="your@ucalgary.ca"
                     value={email}
                     onChange={(e) => {
                       setEmail(e.target.value);
