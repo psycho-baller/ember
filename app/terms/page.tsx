@@ -106,9 +106,9 @@ const TermsPage = () => {
 
         <section>
           <h2 className="text-2xl font-semibold mb-4 pb-2 border-b border-border">Contact Information</h2>
-          <p>For questions about these Terms, please contact us at <a href="mailto:ramim66809@gmail.com" className="text-primary hover:underline">ramim66809@gmail.com</a>.</p>
+          <p>For questions about these Terms, please contact us at <a href="mailto:legal@heyember.me" className="text-primary hover:underline">legal@heyember.me</a>.</p>
         </section>
-      </div>
+    </div>
     </div>
   );
 };

@@ -13,9 +13,6 @@ const MissionSection = () => {
             </h2>
             <div className="space-y-4 text-lg text-muted-foreground leading-relaxed">
               <p>
-                Whether you&apos;re looking for <strong className="text-foreground">friends, study buddies, mentors, collaborators, or even a life partner {" "}</strong>as you go through your day, I got you covered.
-              </p>
-              <p>
                 I get to know you through our chat, create your profile, and as soon as you pass by someone who I think you might like, I&apos;ll provide more information about them for you to decide if you want to connect.
               </p>
               <p className="text-primary font-medium">
