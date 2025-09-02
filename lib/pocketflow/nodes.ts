@@ -253,7 +253,7 @@ export class ChatNode extends Node<SharedStore> {
     log("ChatNode", "exec:send", { msgPreview: truncate(userMsg, 200), length: userMsg.length });
 
     // Generate main response with tool-enabled chat (searchClubs)
-    const personalizedSystemPrompt = PERSONALIZED_SYSTEM_PROMPT(userMsg, shared);
+    const personalizedSystemPrompt = PERSONALIZED_SYSTEM_PROMPT(shared);
     const { text, toolCalls } = await generateText({
       model: openai('gpt-4o'),
       system: personalizedSystemPrompt,

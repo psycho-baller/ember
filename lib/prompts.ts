@@ -95,7 +95,7 @@ json example 2:
 }}
 `
 
-export const PERSONALIZED_SYSTEM_PROMPT = (userMsg: string, sharedStore: SharedStore) => `
+export const PERSONALIZED_SYSTEM_PROMPT = (sharedStore: SharedStore) => `
 ${DEFAULT_SYSTEM_PROMPT}
 ${userInfo(sharedStore)}
 
