@@ -2,15 +2,11 @@
 import { Flow, Node } from "pocketflow";
 import { SharedStore } from "./types";
 import { sendWhatsAppMessage } from "../twilio";
-import { callLlm, callLlmJson } from "../llm";
-import { searchClubs } from "../supabase/queries";
-import { EXTRACT_USER_INFO_FOR_CLUB_MATCHING_PROMPT, SUGGEST_CLUBS_PROMPT } from "../prompts";
-import { emailRe, extractEmail, isYes, looksLikeEmail, noRe, pickBestEmail, userInfo, yesRe } from "../utils";
-import { fetchCandidateEmails, getUserIdByEmail, linkPhoneToProfile, saveSharedStore } from "../supabase/queries";
-import { ModelMessage } from "ai";
+import { callLlm } from "../llm";
+import { emailRe, extractEmail, noRe, pickBestEmail, userInfo, yesRe } from "../utils";
+import { fetchCandidateEmails, getUserIdByEmail, linkPhoneToProfile } from "../supabase/queries";
 import { DEFAULT_SYSTEM_PROMPT } from "../prompts";
-import { isAskingAboutClubs } from "./utils";
-import { z } from "zod";
+import { handleClubRecommendations } from "./utils";
 
 // Simple, consistent logger for this module
 const log = (
@@ -246,49 +242,6 @@ export class ChatNode extends Node<SharedStore> {
     return shared;
   }
 
-  private async handleClubRecommendations(messages: ModelMessage[], userPhone: string): Promise<void> {
-    // get the 2 most recent user messages
-    const lastSixMessages = messages.slice(-6);
-    const lastTwoUserMessages = lastSixMessages.filter(m => m.role === "user").slice(-2);
-    const lastUserMsg = lastTwoUserMessages[0].content as string;
-    const secondLastUserMsg = lastTwoUserMessages[1].content as string;
-    if (!isAskingAboutClubs(lastUserMsg) && !isAskingAboutClubs(secondLastUserMsg)) {
-      log("ChatNode", "handleClubRecommendations", { lastUserMsg, secondLastUserMsg, userPhone, isAskingAboutClubs: false });
-      return;
-    }
-
-    try {
-      const schema = z.object({
-        lookingForClub: z.boolean().describe("Whether the user is asking for club recommendations"),
-        detailedUserInfo: z.string().describe("Detailed user info").optional(),
-      })
-      const keyInfoFromRecentMessages = await callLlmJson<z.infer<typeof schema>>(EXTRACT_USER_INFO_FOR_CLUB_MATCHING_PROMPT(lastSixMessages), schema)
-      log("ChatNode", "handleClubRecommendations", { lastUserMsg, userPhone, detailedUserInfo: keyInfoFromRecentMessages.detailedUserInfo });
-      if (!keyInfoFromRecentMessages.lookingForClub) {
-        log("ChatNode", "handleClubRecommendations", { lastUserMsg, userPhone, lookingForClub: false });
-        return;
-      }
-      const detailedUserInfo = keyInfoFromRecentMessages.detailedUserInfo!;
-      const clubs = await searchClubs({ query: detailedUserInfo });
-      log("ChatNode", "handleClubRecommendations", { userMsg: lastUserMsg, userPhone, detailedUserInfo, clubs });
-
-      // If we have matching clubs, generate and send recommendations
-      if (clubs.length > 0) {
-        const prompt = SUGGEST_CLUBS_PROMPT(detailedUserInfo, clubs);
-        const recommendations = await callLlm([{ role: 'user', content: prompt }]);
-        log("ChatNode", "handleClubRecommendations", { lastUserMsg, userPhone, clubs, recommendations });
-
-        if (recommendations) {
-          log("ChatNode", "handleClubRecommendations", { lastUserMsg, userPhone, clubs, recommendations });
-          // Send recommendations as a separate message
-          await sendWhatsAppMessage(userPhone, recommendations);
-        }
-      }
-    } catch (error) {
-      log("ChatNode", "handleClubRecommendations", { lastUserMsg, userPhone, error });
-    }
-  }
-
   async exec(shared: SharedStore): Promise<string> {
     const userMsg = shared.messages.at(-1)?.content as string;
     if (!userMsg) {
@@ -299,7 +252,7 @@ export class ChatNode extends Node<SharedStore> {
 
     // Start club recommendations as a background task without awaiting it
     if (shared.user.phone) {
-      this.handleClubRecommendations(shared.messages, shared.user.phone).catch(error => {
+      handleClubRecommendations(shared.messages, shared.user.phone).catch(error => {
         log("ChatNode", "exec:handleClubRecommendations", { userMsg, userPhone: shared.user.phone, error });
       });
     }
