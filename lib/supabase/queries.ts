@@ -77,7 +77,7 @@ export async function searchClubs(opts: {
 }): Promise<ClubMatch[]> {
   const supabase = await createClient();
 
-  const { query, k = 8, minSimilarity = 0.2, keyword = null } = opts;
+  const { query, k = 8, minSimilarity = 0.3, keyword = null } = opts;
 
   // 1) Embed the query with Vercel AI SDK + OpenAI provider
   const { embedding } = await embed({
