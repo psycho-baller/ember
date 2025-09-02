@@ -5,7 +5,7 @@ const Footer = () => {
   const socialLinks = [
     {
       name: "LinkedIn",
-      url: "https://linkedin.com/in/rami-m",
+      url: "https://linkedin.com/company/getorbitapp",
       icon: Linkedin,
     },
     {
@@ -20,7 +20,7 @@ const Footer = () => {
     },
     {
       name: "Substack",
-      url: "https://ramimaalouf.substack.com",
+      url: "https://open.substack.com/pub/ramimaalouf/p/the-courage-to-be-chalant?r=2klqgv&utm_campaign=post&utm_medium=web&showWelcomeOnShare=false",
       icon: ({ className }: { className?: string }) => (
         <svg className={className} viewBox="0 0 24 24" fill="currentColor">
           <path d="M22.539 8.242H1.46V5.406h21.08v2.836zM1.46 10.812V24L12 18.11 22.539 24V10.812H1.46zM22.539 0H1.46v2.836h21.08V0z"/>
