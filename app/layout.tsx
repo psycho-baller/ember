@@ -5,6 +5,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import { Toaster } from "@/components/ui/sonner"
 import { Analytics } from "@vercel/analytics/next"
+import Script from "next/script";
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
   : "http://localhost:3000";
@@ -29,6 +30,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <Analytics />
+      <Script src="https://cloud.umami.is/script.js" strategy="afterInteractive" data-website-id="81fcd805-b14a-4d2c-8186-332a9e0c7064"></Script>
       <body className={`${geistSans.className} antialiased min-h-screen`}>
         <Header />
         <Toaster />
