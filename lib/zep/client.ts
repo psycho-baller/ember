@@ -33,7 +33,15 @@ export async function addUserMessage(userData: SharedStore) {
   // Step 2: Create user if not exists
   if (!userExists) {
     console.log("user not found, creating");
-    await client.user.add({ userId, email: userData.user?.email, firstName: userData.user?.firstName, lastName: userData.user?.lastName }); // Add more fields as needed
+    await client.user.add({
+      userId,
+      email: userData.user?.email,
+      firstName: userData.user?.firstName,
+      lastName: userData.user?.lastName,
+      metadata: {
+        phone: userData.user?.phone,
+      }
+    }); // Add more fields as needed
   }
 
   if (!userData.incomingMessage) {
@@ -48,13 +56,18 @@ export async function addUserMessage(userData: SharedStore) {
   const threadId = `${userId}-${weekNumber}`;
   // check if thread exists
   try {
-    await client.thread.get(threadId);
-  } catch (err: ZepError | unknown) {
-    if (err instanceof ZepError && err.statusCode === 404) {
+    const { totalCount } = await client.thread.get(threadId);
+    console.log("thread", totalCount);
+    if (totalCount === 0) {
       console.log("thread not found, creating");
       await client.thread.create({ threadId, userId });
+    }
+  } catch (err: ZepError | unknown) {
+    if (err instanceof ZepError && err.statusCode === 404) {
+      console.log("thread not found (err), creating");
+      await client.thread.create({ threadId, userId });
     } else {
-      console.log("thread not found", err);
+      console.log("thread not found (err)", err);
       throw err; // rethrow other errors
     }
   }
