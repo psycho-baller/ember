@@ -5,13 +5,11 @@ import { runSessionedFlow } from '@/lib/pocketflow/flow';
 
 export async function POST(request: Request) {
   try {
-    // Parse the request body and preserve empty values
     const formData = await request.formData();
     const body = Object.fromEntries(
       formData.entries()
     );
 
-    // Initialize Twilio client
     const twilioSignature = request.headers.get('x-twilio-signature');
     // 2) Reconstruct the EXACT public URL Twilio hit (don’t use req.url if behind proxy)
     const host = request.headers.get("x-forwarded-host") || request.headers.get("host");
