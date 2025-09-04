@@ -3,6 +3,7 @@ import { loadSharedStore, saveSharedStore } from "../supabase/queries";
 import { CheckConfirmationNode, AskForEmailNode, ParseEmailOrConfirmationNode, VerifyAndLinkNode, ChatNode } from "./nodes";
 import { SharedStore } from "./types";
 import { sendWhatsAppMessage } from "../twilio";
+import { addUserMessage } from "../zep/client";
 // import {
 //   CheckConfirmationNode,
 //   AskForEmailNode,
@@ -67,6 +68,10 @@ export async function runSessionedFlow(args: {
   const flow = createConfirmThenChatFlow();
   await flow.run(shared);
 
+  await sendWhatsAppMessage(shared.user.phone, shared.aiResponse || "");
+
+  // zep
+  await addUserMessage(shared);
 
   // Persist
   await saveSharedStore(sessionId, shared, version);
