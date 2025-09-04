@@ -33,7 +33,6 @@ export async function POST(request: Request) {
     const profileName = body.ProfileName.toString();
     const fromNumber = from.replace("whatsapp:", "");
 
-    // Here you can process the incoming message
     console.log(`Received message from ${from}: ${message}`);
 
     const [firstName, lastName] = profileName.split(" ");
@@ -89,11 +88,17 @@ Here's how it works:
     //   to: from
     // });
 
-    return new NextResponse(`<Response><Message>${flow.aiResponse}</Message></Response>`, {
-      headers: { 'Content-Type': 'text/xml' },
+    return NextResponse.json({
+      success: true,
+      code: 200,
+      message: "Message sent successfully",
     });
   } catch (err) {
     console.error(err);
-    return new NextResponse("Internal Server Error", { status: 500 });
+    return NextResponse.json({
+      success: false,
+      code: 500,
+      message: "Internal Server Error",
+    });
   }
 }
