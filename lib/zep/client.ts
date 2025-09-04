@@ -49,8 +49,8 @@ export async function addUserMessage(userData: SharedStore) {
   // check if thread exists
   try {
     await client.thread.get(threadId);
-  } catch (err: any) {
-    if (err.statusCode === 404) {
+  } catch (err: ZepError | unknown) {
+    if (err instanceof ZepError && err.statusCode === 404) {
       console.log("thread not found, creating");
       await client.thread.create({ threadId, userId });
     } else {
@@ -63,12 +63,6 @@ export async function addUserMessage(userData: SharedStore) {
     name: userData.user?.firstName || "User",
     role: "user",
     content: userData.incomingMessage,
-    // 5 seconds earlier
-    createdAt: new Date(today.getTime() - 5 * 1000).toISOString(),
-  }, {
-    name: "Ember",
-    role: "assistant",
-    content: userData.aiResponse || "",
     createdAt: today.toISOString(),
   }];
   const { context, messageUuids } = await client.thread.addMessages(threadId, { messages, returnContext: true });
