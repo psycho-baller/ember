@@ -1,4 +1,4 @@
-import { ZepClient, Zep } from "@getzep/zep-cloud";
+import { ZepClient, Zep, ZepError } from "@getzep/zep-cloud";
 import { getWeek } from "date-fns";
 import { SharedStore } from "../pocketflow/types";
 import { getUserIdByEmail } from "../supabase/queries";
@@ -20,8 +20,8 @@ export async function addUserMessage(userData: SharedStore) {
   try {
     const user = await client.user.get(userId);
     console.log("user", user);
-  } catch (err: any) {
-    if (err.statusCode === 404) {
+  } catch (err: ZepError | unknown) {
+    if (err instanceof ZepError && err.statusCode === 404) {
       console.log("user not found");
       userExists = false;
     } else {
