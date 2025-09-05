@@ -232,14 +232,14 @@ const Student: EntityType = {
   description: "University student profile used for matching.",
   fields: {
     program_code: entityFields.text("Program code, e.g., CPSC."),
-    year: entityFields.integer("Academic year as integer, e.g., 1–5."),
+    year: entityFields.integer("Academic year as integer, e.g., 1-5."),
     timezone: entityFields.text("IANA timezone, e.g., America/Edmonton."),
     visibility: entityFields.text("Profile visibility level, e.g., public|private|campus."),
   },
 };
 
 const Program: EntityType = {
-  description: "Academic program or major.",
+  description: "Academic program or major at University of Calgary",
   fields: {
     code: entityFields.text("Program code, e.g., CPSC."),
     // name: entityFields.text("Program name, e.g., Computer Science."),
@@ -248,67 +248,59 @@ const Program: EntityType = {
 };
 
 const Course: EntityType = {
-  description: "Specific course offering.",
+  description: "Specific course offering at University of Calgary",
   fields: {
-    code: entityFields.text("Catalog code, e.g., CPSC 457."),
-    term: entityFields.text("Term identifier, e.g., 2025F."),
-    section: entityFields.text("Section identifier, e.g., LEC 01."),
-    title: entityFields.text("Course title."),
+    code: entityFields.text("Catalog code, e.g., PSYC 325."),
   },
 };
 
 const Trait: EntityType = {
-  description: "Personal trait relevant to matching.",
+  description: "A personality trait that describes a user. This is used for matching users based on their traits.",
   fields: {
-    category: entityFields.text("Trait category, e.g., personality, skill."),
-    // name: entityFields.text("Trait name, e.g., introvert, leadership."),
+    description: entityFields.text("More details on the user's trait and context on it"),
   },
 };
 
 const MeetupType: EntityType = {
-  description: "Preferred meetup format or context.",
+  description: "A meetup type that the user prefers when meeting with new people. For example, cafe, lunch, walk, gym, etc.",
   fields: {
-    // name: entityFields.text("Meetup style, e.g., coffee chat, co-working."),
-    description: entityFields.text("Short description."),
+    description: entityFields.text("More details on the user's meetup type and context on it"),
   },
 };
 
 const Goal: EntityType = {
-  description: "User goal targeted by matching.",
+  description: "A goal that the user wants to achieve. Whether it's academic, social, entrepreneurial, or personal. This is used for matching users based on their goals.",
   fields: {
-    // name: entityFields.text("Goal name, e.g., improve writing."),
-    timeframe: entityFields.text("Time horizon, e.g., short-term, this semester."),
+    description: entityFields.text("More details on the user's goal and context on it"),
   },
 };
 
 const Dorm: EntityType = {
-  description: "Residence building.",
+  description: "A dormitory building in University of Calgary campus.",
   fields: {
-    // name: entityFields.text("Dorm name."),
-    campus_area: entityFields.text("Area or quadrant on campus."),
+    code: entityFields.text("Dorm code, here's a list of dorms and their associated codes:'Kananaskis Hall'->'KA','Rundle Hall'->'RU','International House'->'IH','Yamnuska Hall'->'YA','Cascade Hall'->'CD','Aurora Hall'->'AU','Glacier Hall'->'GL','Olympus Hall'->'OL','Crowsnest Hall'->'CR','Varsity Courts'->'VC'"),
   },
 };
 
 const Language: EntityType = {
-  description: "Human language with ISO code.",
+  description: "Language spoken by the user.",
   fields: {
-    iso_639_1: entityFields.text("Two-letter ISO 639-1 code, e.g., en, fr."),
-    // name: entityFields.text("Display name, e.g., English."),
+    code: entityFields.text("Three-letter language code; e.g., ara, eng, fra, spa, deu, dan, zho, jpn, etc."),
   },
 };
 
-const Persona: EntityType = {
-  description: "User-defined matching persona with preferences.",
-  fields: {
-    label: entityFields.text("Short label for the persona."),
-    description: entityFields.text("Narrative description of the persona."),
-  },
-};
+// const Persona: EntityType = {
+//   description: "User-defined matching persona with preferences.",
+//   fields: {
+//     label: entityFields.text("Short label for the persona."),
+//     description: entityFields.text("Narrative description of the persona."),
+//   },
+// };
 
 const Year: EntityType = {
-  description: "Academic year band for persona seeks.",
+  description: "Graduating class of the student.",
   fields: {
-    value: entityFields.integer("Year value as integer, e.g., 1-5."),
+    value: entityFields.integer("Year value, e.g., 2026, 2027, 2028, 2029, etc."),
   },
 };
 
@@ -326,100 +318,163 @@ const baseEdgeFields = {
 };
 
 const ENROLLED_IN: EdgeType = {
-  description: "Student is enrolled in a specific course offering.",
+  description: "Represents that the user is enrolled in a specific course offered at University of Calgary",
   fields: {
     ...baseEdgeFields,
-    code: entityFields.text("Course catalog code, e.g., CPSC 457."),
-    term: entityFields.text("Term identifier, e.g., 2025F."),
+    term: entityFields.text("Term identifier, e.g., F25, W26, P26, S26, etc."),
     section: entityFields.text("Section identifier, e.g., LEC 01."),
+    title: entityFields.text("Course title."),
   },
   sourceTargets: [{ source: "User", target: "Course" }],
 };
 
-const MATCH_RECOMMENDED: EdgeType = {
-  description: "System recommended a match between users.",
+const BELONGS_TO: EdgeType = {
+  description: "Represents that the course belongs to a specific program/major at University of Calgary",
   fields: {
     ...baseEdgeFields,
-    reason_vector: entityFields.text("Stringified list of reasons or tags."),
-    created_ts: entityFields.text("Recommendation timestamp (ISO 8601)."),
+    // type: entityFields.text("Program, e.g., cafe, lunch, walk, gym, etc."),
   },
-  sourceTargets: [{ source: "User", target: "User" }],
+  sourceTargets: [{ source: "Course", target: "Program" }],
 };
 
-const MATCH_ACCEPTED: EdgeType = {
-  description: "Student accepted a recommended match.",
+const STUDIES_IN: EdgeType = {
+  description: "Represents that the user studies in a specific program/major at University of Calgary",
   fields: {
     ...baseEdgeFields,
-    ts: entityFields.text("Acceptance timestamp (ISO 8601)."),
+    // type: entityFields.text("Program, e.g., cafe, lunch, walk, gym, etc."),
   },
-  sourceTargets: [{ source: "User", target: "User" }],
+  sourceTargets: [{ source: "User", target: "Program" }],
 };
 
-const MATCH_DECLINED: EdgeType = {
-  description: "Student declined a recommended match.",
+const SPEAKS: EdgeType = {
+  description: "Represents that the user speaks a specific language.",
   fields: {
     ...baseEdgeFields,
-    ts: entityFields.text("Decline timestamp (ISO 8601)."),
+    proficiency: entityFields.integer("Proficiency level; e.g., 1-5."),
   },
-  sourceTargets: [{ source: "User", target: "User" }],
+  sourceTargets: [{ source: "User", target: "Language" }],
 };
 
-const MET_WITH: EdgeType = {
-  description: "Two students met in real life or virtually.",
+const RESIDES_IN: EdgeType = {
+  description: "Represents that the user resides in a specific dormitory building at University of Calgary",
   fields: {
     ...baseEdgeFields,
-    ts: entityFields.text("Meeting timestamp (ISO 8601)."),
-    location: entityFields.text("Freeform location string. Optional."),
-    duration: entityFields.integer("Duration in minutes. Optional."),
+    // type: entityFields.text("Dorm, e.g., cafe, lunch, walk, gym, etc."),
   },
-  sourceTargets: [{ source: "User", target: "User" }],
+  sourceTargets: [{ source: "User", target: "Dorm" }],
 };
 
-const GAVE_FEEDBACK: EdgeType = {
-  description: "Student gave feedback on another student after a meeting.",
+const HAS_GOAL: EdgeType = {
+  description: "Represents that the user has a goal they want to achieve.",
   fields: {
     ...baseEdgeFields,
-    rating: entityFields.integer("Numeric rating, e.g., 1-5."),
-    tags: entityFields.text("Stringified list of tags, e.g., 'on-time,engaging'."),
+    // type: entityFields.text("Goal, e.g., cafe, lunch, walk, gym, etc."),
   },
-  sourceTargets: [{ source: "User", target: "User" }],
+  sourceTargets: [{ source: "User", target: "Goal" }],
 };
 
-const WANTS_TO_MEET: EdgeType = {
-  description: "Student wants to meet a specific persona.",
+
+const PREFERS_MEETUP: EdgeType = {
+  description: "Student prefers a specific meetup type.",
   fields: {
     ...baseEdgeFields,
+    // type: entityFields.text("Meetup type, e.g., cafe, lunch, walk, gym, etc."),
   },
-  sourceTargets: [{ source: "User", target: "Persona" }],
+  sourceTargets: [{ source: "User", target: "MeetupType" }],
 };
 
-const PERSONA_SEEKS_TOPIC: EdgeType = {
-  description: "Persona seeks others around a topic, with interaction modality.",
+const INTERESTED_IN: EdgeType = {
+  description: "Student is interested in a specific topic.",
   fields: {
     ...baseEdgeFields,
-    modality: entityFields.text('Interaction mode: "talk" or "do".'),
+    // type: entityFields.text("Topic, e.g., cafe, lunch, walk, gym, etc."),
   },
-  sourceTargets: [{ source: "Persona", target: "Topic" }], // Topic = default entity type
+  sourceTargets: [{ source: "User", target: "Topic" }],
 };
+// const MATCH_RECOMMENDED: EdgeType = {
+//   description: "System recommended a match between users.",
+//   fields: {
+//     ...baseEdgeFields,
+//     reason_vector: entityFields.text("Stringified list of reasons or tags."),
+//     created_ts: entityFields.text("Recommendation timestamp (ISO 8601)."),
+//   },
+//   sourceTargets: [{ source: "User", target: "User" }],
+// };
 
-const PERSONA_SEEKS_LANGUAGE: EdgeType = {
-  description: "Persona seeks partners by language and proficiency.",
-  fields: {
-    ...baseEdgeFields,
-    min_proficiency: entityFields.integer("Minimum proficiency 0–5. Optional."),
-  },
-  sourceTargets: [{ source: "Persona", target: "Language" }],
-};
+// const MATCH_ACCEPTED: EdgeType = {
+//   description: "Student accepted a recommended match.",
+//   fields: {
+//     ...baseEdgeFields,
+//     ts: entityFields.text("Acceptance timestamp (ISO 8601)."),
+//   },
+//   sourceTargets: [{ source: "User", target: "User" }],
+// };
 
-const PERSONA_SEEKS_YEAR: EdgeType = {
-  description: "Persona seeks partners within an academic year band.",
-  fields: {
-    ...baseEdgeFields,
-    min: entityFields.integer("Minimum academic year inclusive. Optional."),
-    max: entityFields.integer("Maximum academic year inclusive. Optional."),
-  },
-  sourceTargets: [{ source: "Persona", target: "Year" }],
-};
+// const MATCH_DECLINED: EdgeType = {
+//   description: "Student declined a recommended match.",
+//   fields: {
+//     ...baseEdgeFields,
+//     ts: entityFields.text("Decline timestamp (ISO 8601)."),
+//   },
+//   sourceTargets: [{ source: "User", target: "User" }],
+// };
+
+// const MET_WITH: EdgeType = {
+//   description: "Two students met in real life or virtually.",
+//   fields: {
+//     ...baseEdgeFields,
+//     ts: entityFields.text("Meeting timestamp (ISO 8601)."),
+//     location: entityFields.text("Freeform location string. Optional."),
+//     duration: entityFields.integer("Duration in minutes. Optional."),
+//   },
+//   sourceTargets: [{ source: "User", target: "User" }],
+// };
+
+// const GAVE_FEEDBACK: EdgeType = {
+//   description: "Student gave feedback on another student after a meeting.",
+//   fields: {
+//     ...baseEdgeFields,
+//     rating: entityFields.integer("Numeric rating, e.g., 1-5."),
+//     tags: entityFields.text("Stringified list of tags, e.g., 'on-time,engaging'."),
+//   },
+//   sourceTargets: [{ source: "User", target: "User" }],
+// };
+
+// const WANTS_TO_MEET: EdgeType = {
+//   description: "Student wants to meet a specific persona.",
+//   fields: {
+//     ...baseEdgeFields,
+//   },
+//   sourceTargets: [{ source: "User", target: "Persona" }],
+// };
+
+// const PERSONA_SEEKS_TOPIC: EdgeType = {
+//   description: "Persona seeks others around a topic, with interaction modality.",
+//   fields: {
+//     ...baseEdgeFields,
+//     modality: entityFields.text('Interaction mode: "talk" or "do".'),
+//   },
+//   sourceTargets: [{ source: "Persona", target: "Topic" }], // Topic = default entity type
+// };
+
+// const PERSONA_SEEKS_LANGUAGE: EdgeType = {
+//   description: "Persona seeks partners by language and proficiency.",
+//   fields: {
+//     ...baseEdgeFields,
+//     min_proficiency: entityFields.integer("Minimum proficiency 0–5. Optional."),
+//   },
+//   sourceTargets: [{ source: "Persona", target: "Language" }],
+// };
+
+// const PERSONA_SEEKS_YEAR: EdgeType = {
+//   description: "Persona seeks partners within an academic year band.",
+//   fields: {
+//     ...baseEdgeFields,
+//     min: entityFields.integer("Minimum academic year inclusive. Optional."),
+//     max: entityFields.integer("Maximum academic year inclusive. Optional."),
+//   },
+//   sourceTargets: [{ source: "Persona", target: "Year" }],
+// };
 
 // Register the ontology with Zep
 
@@ -442,20 +497,18 @@ async function createOntology() {
       Dorm,
       Language,
       // Group,
-      Persona,
+      // Persona,
       Year,
     },
     {
       ENROLLED_IN,
-      MATCH_RECOMMENDED,
-      MATCH_ACCEPTED,
-      MATCH_DECLINED,
-      MET_WITH,
-      GAVE_FEEDBACK,
-      WANTS_TO_MEET,
-      PERSONA_SEEKS_TOPIC,
-      PERSONA_SEEKS_LANGUAGE,
-      PERSONA_SEEKS_YEAR,
+      PREFERS_MEETUP,
+      INTERESTED_IN,
+      BELONGS_TO,
+      HAS_GOAL,
+      RESIDES_IN,
+      SPEAKS,
+      STUDIES_IN,
     }
   );
 
@@ -464,6 +517,7 @@ async function createOntology() {
 
 export default createOntology;
 
+// @ts-ignore
 if (import.meta.main) {
   createOntology().catch(err => { console.error(err); process.exit(1); });
 }

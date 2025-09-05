@@ -4,7 +4,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "create:ontology": "bun lib/zep/ontology.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^2.0.23",
