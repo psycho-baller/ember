@@ -13,7 +13,7 @@ export const client = new ZepClient({
 export async function addUserMessage(userData: SharedStore) {
   // Step 1: Check if user exists
   let userExists = true;
-  const userId = await getUserIdByEmail(userData.user?.email!);
+  const userId = await getUserIdByEmail(userData.user?.email as string);
   if (!userId) {
     return;
   }
