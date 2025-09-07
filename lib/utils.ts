@@ -185,5 +185,6 @@ export function userInfo(shared: SharedStore): string {
   return `
 Here is some info on the student you are currently chatting with:
 
-Name: ${shared.user?.firstName} ${shared.user?.lastName}`;
+Name: ${shared.user?.firstName} ${shared.user?.lastName}
+Email: ${shared.user?.email}`;
 }
