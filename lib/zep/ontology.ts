@@ -229,12 +229,13 @@ export const edge_type_map = {
 /** ---------- ENTITY TYPES (<=10 custom) ---------- **/
 
 const Student: EntityType = {
-  description: "University student profile used for matching.",
+  description: "University student that is sending messages",
   fields: {
-    program_code: entityFields.text("Program code, e.g., CPSC."),
-    year: entityFields.integer("Academic year as integer, e.g., 1-5."),
-    timezone: entityFields.text("IANA timezone, e.g., America/Edmonton."),
-    visibility: entityFields.text("Profile visibility level, e.g., public|private|campus."),
+    student_id: entityFields.text("Student ID"),
+    student_first_name: entityFields.text("Student first name"),
+    student_last_name: entityFields.text("Student last name"),
+    student_email: entityFields.text("Student email"),
+    student_phone: entityFields.text("Student phone"),
   },
 };
 
@@ -255,35 +256,35 @@ const Course: EntityType = {
 };
 
 const Trait: EntityType = {
-  description: "A personality trait that describes a user. This is used for matching users based on their traits.",
+  description: "A personality trait that describes a student. This is used for matching users based on their traits. For example, Student('Alice') -> RELATES_TO -> Trait('charismatic')",
   fields: {
-    description: entityFields.text("More details on the user's trait and context on it"),
+    description: entityFields.text("More details on the student's trait and context on it"),
   },
 };
 
 const MeetupType: EntityType = {
-  description: "A meetup type that the user prefers when meeting with new people. For example, cafe, lunch, walk, gym, etc.",
+  description: "A meetup type that a student prefers when meeting with new people. For example, Student('Alice') -> PREFERS_MEETUP -> MeetupType('cafe') // cafe, lunch, walk, gym, etc.",
   fields: {
-    description: entityFields.text("More details on the user's meetup type and context on it"),
+    description: entityFields.text("More details on the student's preferred meetup type and context on it"),
   },
 };
 
 const Goal: EntityType = {
-  description: "A goal that the user wants to achieve. Whether it's academic, social, entrepreneurial, or personal. This is used for matching users based on their goals.",
+  description: "A goal that a student wants to achieve. Whether it's academic, social, entrepreneurial, or personal. For example, Student('Toby') -> HAS_GOAL -> Goal('start a YouTube channel')",
   fields: {
-    description: entityFields.text("More details on the user's goal and context on it"),
+    description: entityFields.text("More details on the student's goal and context on it"),
   },
 };
 
 const Dorm: EntityType = {
-  description: "A dormitory building in University of Calgary campus.",
+  description: "A dormitory building in University of Calgary campus. For example, Student('Bob') -> RESIDES_IN -> Dorm('KA')",
   fields: {
     code: entityFields.text("Dorm code, here's a list of dorms and their associated codes:'Kananaskis Hall'->'KA','Rundle Hall'->'RU','International House'->'IH','Yamnuska Hall'->'YA','Cascade Hall'->'CD','Aurora Hall'->'AU','Glacier Hall'->'GL','Olympus Hall'->'OL','Crowsnest Hall'->'CR','Varsity Courts'->'VC'"),
   },
 };
 
 const Language: EntityType = {
-  description: "Language spoken by the user.",
+  description: "Language spoken by a student. For example, Student('Alice') -> SPEAKS -> Language('spa')",
   fields: {
     code: entityFields.text("Three-letter language code; e.g., ara, eng, fra, spa, deu, dan, zho, jpn, etc."),
   },
@@ -309,27 +310,27 @@ const Year: EntityType = {
 /** ---------- EDGE TYPES (<=10 custom) ---------- **/
 
 const baseEdgeFields = {
-  weight: entityFields.integer("Relationship weight. Optional."),
-  confidence: entityFields.integer("Extraction confidence 0-1. Optional."),
-  valid_from: entityFields.text("Validity start (ISO 8601). Optional."),
-  valid_to: entityFields.text("Validity end (ISO 8601). Optional."),
-  visibility: entityFields.text("Visibility scope for this edge. Optional."),
-  source: entityFields.text("Provenance or system source. Optional."),
+  // weight: entityFields.integer("Relationship weight. Optional."),
+  confidence: entityFields.integer("Extraction confidence 0-1"),
+  // valid_from: entityFields.text("Validity start (ISO 8601). Optional."),
+  // valid_to: entityFields.text("Validity end (ISO 8601). Optional."),
+  // visibility: entityFields.text("Visibility scope for this edge. Optional."),
+  // source: entityFields.text("Provenance or system source. Optional."),
 };
 
 const ENROLLED_IN: EdgeType = {
-  description: "Represents that the user is enrolled in a specific course offered at University of Calgary",
+  description: "Represents that the user is enrolled in a specific course offered at University of Calgary. For example, Student('Bob') -> ENROLLED_IN -> Course('PSYC 325')",
   fields: {
     ...baseEdgeFields,
     term: entityFields.text("Term identifier, e.g., F25, W26, P26, S26, etc."),
     section: entityFields.text("Section identifier, e.g., LEC 01."),
     title: entityFields.text("Course title."),
   },
-  sourceTargets: [{ source: "User", target: "Course" }],
+  sourceTargets: [{ source: "Student", target: "Course" }],
 };
 
 const BELONGS_TO: EdgeType = {
-  description: "Represents that the course belongs to a specific program/major at University of Calgary",
+  description: "Represents that the course belongs to a specific program/major at University of Calgary. For example, Course('PSYC 325') -> BELONGS_TO -> Program('PSYC')",
   fields: {
     ...baseEdgeFields,
     // type: entityFields.text("Program, e.g., cafe, lunch, walk, gym, etc."),
@@ -338,68 +339,68 @@ const BELONGS_TO: EdgeType = {
 };
 
 const STUDIES_IN: EdgeType = {
-  description: "Represents that the user studies in a specific program/major at University of Calgary",
+  description: "Represents that the user studies in a specific program/major at University of Calgary. For example, Student('Bob') -> STUDIES_IN -> Program('PSYC')",
   fields: {
     ...baseEdgeFields,
     // type: entityFields.text("Program, e.g., cafe, lunch, walk, gym, etc."),
   },
-  sourceTargets: [{ source: "User", target: "Program" }],
+  sourceTargets: [{ source: "Student", target: "Program" }],
 };
 
 const SPEAKS: EdgeType = {
-  description: "Represents that the user speaks a specific language.",
+  description: "Represents that the user speaks a specific language. For example, Student('Charlie') -> SPEAKS -> Language('fra')",
   fields: {
     ...baseEdgeFields,
     proficiency: entityFields.integer("Proficiency level; e.g., 1-5."),
   },
-  sourceTargets: [{ source: "User", target: "Language" }],
+  sourceTargets: [{ source: "Student", target: "Language" }],
 };
 
 const RESIDES_IN: EdgeType = {
-  description: "Represents that the user resides in a specific dormitory building at University of Calgary",
+  description: "Represents that the user resides in a specific dormitory building at University of Calgary. For example, Student('David') -> RESIDES_IN -> Dorm('KA')",
   fields: {
     ...baseEdgeFields,
     // type: entityFields.text("Dorm, e.g., cafe, lunch, walk, gym, etc."),
   },
-  sourceTargets: [{ source: "User", target: "Dorm" }],
+  sourceTargets: [{ source: "Student", target: "Dorm" }],
 };
 
 const HAS_GOAL: EdgeType = {
-  description: "Represents that the user has a goal they want to achieve.",
+  description: "Represents that the user has a goal they want to achieve. For example, Student('David') -> HAS_GOAL -> Goal('find a job in tutoring')",
   fields: {
     ...baseEdgeFields,
     // type: entityFields.text("Goal, e.g., cafe, lunch, walk, gym, etc."),
   },
-  sourceTargets: [{ source: "User", target: "Goal" }],
+  sourceTargets: [{ source: "Student", target: "Goal" }],
 };
 
 
 const PREFERS_MEETUP: EdgeType = {
-  description: "Student prefers a specific meetup type.",
+  description: "Represents that the student prefers a specific meetup type when meeting with new people. For example, Student('Eve') -> PREFERS_MEETUP -> MeetupType('lunch')",
   fields: {
     ...baseEdgeFields,
     // type: entityFields.text("Meetup type, e.g., cafe, lunch, walk, gym, etc."),
   },
-  sourceTargets: [{ source: "User", target: "MeetupType" }],
+  sourceTargets: [{ source: "Student", target: "MeetupType" }],
 };
 
 const INTERESTED_IN: EdgeType = {
-  description: "Student is interested in a specific topic.",
+  description: "Represents that the student is interested in a specific activity, topic, or trait, etc. For example, Student('Eve') -> INTERESTED_IN -> Trait('stoicism')",
   fields: {
     ...baseEdgeFields,
     // type: entityFields.text("Topic, e.g., cafe, lunch, walk, gym, etc."),
   },
-  sourceTargets: [{ source: "User", target: "Topic" }],
+  sourceTargets: [{ source: "Student", target: "Topic" }],
 };
-// const MATCH_RECOMMENDED: EdgeType = {
-//   description: "System recommended a match between users.",
-//   fields: {
-//     ...baseEdgeFields,
-//     reason_vector: entityFields.text("Stringified list of reasons or tags."),
-//     created_ts: entityFields.text("Recommendation timestamp (ISO 8601)."),
-//   },
-//   sourceTargets: [{ source: "User", target: "User" }],
-// };
+
+const MATCH_RECOMMENDED: EdgeType = {
+  description: "This represents that a friendship and relationship expert who is specialized at helping university students find real belongingness and connection with their peers recommended a match between these two students. For example, Student('Eve') -> MATCH_RECOMMENDED -> Student('Frank')",
+  fields: {
+    ...baseEdgeFields,
+    reasoning: entityFields.text("A very detailed description on why these two people would be great fits to meet up.")
+  },
+  sourceTargets: [{ source: "Student", target: "Student" }],
+};
 
 // const MATCH_ACCEPTED: EdgeType = {
 //   description: "Student accepted a recommended match.",
@@ -485,7 +486,7 @@ async function createOntology() {
 
   const ontology = await client.graph.setOntology(
     {
-      // Student,
+      Student,
       Program,
       Course,
       // Club,
@@ -509,6 +510,10 @@ async function createOntology() {
       RESIDES_IN,
       SPEAKS,
       STUDIES_IN,
+      // MATCH_RECOMMENDED,
+    },
+    {
+      graphIds: ["all_users"]
     }
   );
 
