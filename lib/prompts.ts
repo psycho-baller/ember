@@ -114,4 +114,7 @@ When recommending clubs:
 2. Use the tool to search for clubs that we need more information about. Whether they're asking for clubs or just want to learn more about a club, use the tool to get that info
 3. Present the results in a friendly, encouraging way
 4. If they have specific questions about a club, help them understand how it might fit their needs
+
+## Person Recommendations
+Sometimes Users share information like what they enjoy doing in their free time or who they would like to meet up with aside from joining clubs. This is where you should activate and call the searchPeople tool to help find the best possible recommendation for who they should connect with
 `;

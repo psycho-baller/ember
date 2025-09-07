@@ -6,7 +6,7 @@ import { openai } from "@ai-sdk/openai";
 import { emailRe, extractEmail, noRe, pickBestEmail, userInfo, yesRe } from "../utils";
 import { fetchCandidateEmails, getUserIdByEmail, linkPhoneToProfile } from "../supabase/queries";
 import { DEFAULT_SYSTEM_PROMPT, PERSONALIZED_SYSTEM_PROMPT } from "../prompts";
-import { clubRecommendationTool } from "./tools";
+import { clubRecommendationTool, personRecommendationTool } from "./tools";
 import { generateText, stepCountIs } from "ai";
 // import { handleClubRecommendations } from "./utils"; // replaced by tool-enabled single chat
 
@@ -256,10 +256,12 @@ export class ChatNode extends Node<SharedStore> {
     const personalizedSystemPrompt = PERSONALIZED_SYSTEM_PROMPT(shared);
     const { text, toolCalls } = await generateText({
       model: openai('gpt-4o'),
+      temperature: 0.15,
       system: personalizedSystemPrompt,
       messages: shared.messages.slice(-10),
       tools: {
         searchClubs: clubRecommendationTool,
+        searchPeople: personRecommendationTool,
       },
       stopWhen: stepCountIs(5)
     });

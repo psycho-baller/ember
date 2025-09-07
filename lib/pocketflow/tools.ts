@@ -1,6 +1,8 @@
 import { tool } from "ai";
 import { z } from 'zod';
 import { searchClubs } from "../supabase/queries";
+import { figureOutIntention } from "./utils";
+import { searchPeople } from "../zep/queries";
 
 export const clubRecommendationTool = tool({
   description: 'You have extensive knowledge on all the clubs in the University of Calgary, and your goal is to provide information on university clubs in UCalgary. Whether the student is looking for clubs that match their interests and preferences or just want to learn more about a club. You should use this tool to get the information needed to answer the user\'s query appropriately.',
@@ -44,6 +46,54 @@ export const clubRecommendationTool = tool({
       success: true,
       clubs: recommendations,
       totalFound: clubs.length
+    };
+  },
+});
+
+export const personRecommendationTool = tool({
+  description: 'You have extensive knowledge on all the people in the University of Calgary, and your goal is to help provide the user with the best possible recommendation for who they should connect with',
+  inputSchema: z.object({
+    intention: z.enum(['friendship', 'romantic', 'mentor', 'mentee', 'gym_buddy', 'group_project', 'other']).describe("What kind of relationship is the user looking for?"),
+    // keyInfo: z.string().describe('The key information that we need to help find the best possible recommendation for who they should connect with. Make it very thorough and accurate. E.g. "I would like to meet people in the gym who like improv" -> "Rami enjoys improv  likes to meet people in the gym"'),
+    query: z.string().describe('the user message'),
+    firstName: z.string().describe('the student\'s first name').optional(),
+    lastName: z.string().describe('the student\'s last name').nullable(),
+    email: z.string().describe('the student\'s email').nullable(),
+    interests: z.array(z.string()).describe('User interests and hobbies based on the whole conversation. E.g. "I would like to meet people in the gym who like improv" -> ["gym", "improv"]').nullable(),
+    preferences: z.string().describe('Additional preferences or requirements based on the whole conversation. E.g. "I would like to meet people in the gym who like improv" -> ["make friends in the gym", "find improv enthusiasts"]').nullable(),
+  }),
+  execute: async ({ intention, query, interests, preferences, firstName, lastName, email }) => {
+    // Combine all info for search
+    const searchQuery = `The student ${firstName} ${lastName || ''} with email ${email || ''} is looking to ${figureOutIntention(intention)}
+
+    ${firstName} just shared: "${query}"
+
+    ${firstName} has these interests: ${interests?.join(' ')}
+
+    ${firstName} has these preferences: ${preferences}`;
+
+    console.log("Search query:", searchQuery);
+
+    const people = await searchPeople({ query: searchQuery });
+    if (people.length === 0) {
+      return {
+        success: false,
+        message: "There are no people that match the query. Continue learning more about the user to find the perfect person for them."
+      };
+    }
+
+    // Format person recommendations
+    // const recommendations = people.slice(0, 5).map((person, idx) => ({
+    //   // rank: idx + 1,
+    //   name: person.name,
+    //   description: person.description,
+    //   summary: person.summary,
+    //   similarity: person.similarity,
+    //   url: person.url,
+    // }));
+    return {
+      success: true,
+      person: people[0],
     };
   },
 });
