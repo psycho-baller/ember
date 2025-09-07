@@ -95,3 +95,22 @@ export async function handleClubRecommendations(messages: ModelMessage[], userPh
     log("ChatNode", "handleClubRecommendations", { lastUserMsg, userPhone, error });
   }
 }
+
+export function figureOutIntention(intention: string): string {
+  switch (intention) {
+    case 'friendship':
+      return "make friends";
+    case 'romantic':
+      return "find a romantic partner";
+    case 'mentor':
+      return 'find a mentor';
+    case 'mentee':
+      return 'find a mentee';
+    case 'gym_buddy':
+      return 'find a gym buddy';
+    case 'group_project':
+      return 'find a group project partner';
+    default:
+      return 'find someone else';
+  }
+}
