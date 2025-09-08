@@ -513,7 +513,7 @@ async function createOntology() {
       // MATCH_RECOMMENDED,
     },
     {
-      graphIds: ["all_users"]
+      graphIds: [process.env.ZEP_GRAPH_ID || "all_users"]
     }
   );
 

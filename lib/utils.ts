@@ -7,6 +7,7 @@ import { SharedStore } from "./pocketflow/types";
 import { searchClubs } from "./supabase/queries";
 import MessagingResponse from "twilio/lib/twiml/MessagingResponse";
 
+import users from "./zep/mock_users.json";
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -182,9 +183,17 @@ export function extractEmail(text?: string): string | null {
  * @returns
  */
 export function userInfo(shared: SharedStore): string {
+  const realUser = shared.user;
+  const mockUser2 = {
+    firstName: users[1].first_name,
+    lastName: users[1].last_name,
+    email: users[1].email,
+    phone: users[1].phone,
+  };
+  const user = process.env.ZEP_GRAPH_ID?.includes("mock") ? mockUser2 : realUser;
   return `
 Here is some info on the student you are currently chatting with:
 
-Name: ${shared.user?.firstName} ${shared.user?.lastName}
-Email: ${shared.user?.email}`;
+Name: ${user.firstName} ${user.lastName}
+Email: ${user.email}`;
 }
