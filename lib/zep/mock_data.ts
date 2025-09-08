@@ -55,7 +55,7 @@ async function addUsersToGraph(addUser: boolean = true) {
   }
 }
 
-// @ts-ignore
+// @ts-expect-error
 if (import.meta.main) {
   addUsersToGraph(false).catch(console.error);
 }
