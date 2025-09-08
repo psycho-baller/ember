@@ -522,8 +522,7 @@ async function createOntology() {
 
 export default createOntology;
 
-// @ts-expect-error
-if (import.meta.main) {
+if (require.main === module) {
   createOntology().catch(err => { console.error(err); process.exit(1); });
 }
 // ---------------------------
