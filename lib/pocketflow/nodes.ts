@@ -256,7 +256,7 @@ export class ChatNode extends Node<SharedStore> {
     const personalizedSystemPrompt = PERSONALIZED_SYSTEM_PROMPT(shared);
     const { text, toolCalls } = await generateText({
       model: openai('gpt-4o'),
-      temperature: 0.15,
+      temperature: 0,
       system: personalizedSystemPrompt,
       messages: shared.messages.slice(-10),
       tools: {
