@@ -1,6 +1,6 @@
 import { ZepClient } from "@getzep/zep-cloud";
 import users from "./mock_users.json";
-import messagesData from "./mock_user_messages_uni.json";
+import messagesData from "./mock_user_messages_travels.json";
 
 // Define the type for the messages object
 type UserMessages = {
