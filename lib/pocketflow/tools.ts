@@ -2,7 +2,7 @@ import { tool } from "ai";
 import { z } from 'zod';
 import { searchClubs } from "../supabase/queries";
 import { figureOutIntention } from "./utils";
-import { searchPeople } from "../zep/queries";
+import { extractUserInfoAndConnections, getStudentNode, searchPeople } from "../zep/queries";
 
 export const clubRecommendationTool = tool({
   description: 'You have extensive knowledge on all the clubs in the University of Calgary, and your goal is to provide information on university clubs in UCalgary. Whether the student is looking for clubs that match their interests and preferences or just want to learn more about a club. You should use this tool to get the information needed to answer the user\'s query appropriately.',
@@ -50,6 +50,17 @@ export const clubRecommendationTool = tool({
   },
 });
 
+export const extractUserInfoAndConnectionsTool = tool({
+  description: 'You have extensive knowledge On the current student you are interacting with. You should call this tool to get information for both the student and the people who have some commonalities with them.',
+  inputSchema: z.object({
+    student_first_name: z.string().describe('The student\'s first name'),
+    student_last_name: z.string().describe('The student\'s last name'),
+    student_email: z.string().describe('The student\'s email'),
+    // student_phone: z.string().describe('The student\'s phone number'),
+  }),
+  execute: async (input) => extractUserInfoAndConnections(input),
+})
+
 export const personRecommendationTool = tool({
   description: 'You have extensive knowledge on all the people in the University of Calgary, and your goal is to help provide the user with the best possible recommendation for who they should connect with',
   inputSchema: z.object({
@@ -94,6 +105,31 @@ export const personRecommendationTool = tool({
     return {
       success: true,
       person: people[0],
+    };
+  },
+});
+
+/**
+ * get summary of student from zep data
+ */
+export const getStudentSummaryTool = tool({
+  description: 'You have extensive knowledge on all the people in the University of Calgary, and your goal is to help provide the user with the best possible recommendation for who they should connect with',
+  inputSchema: z.object({
+    student_first_name: z.string().describe('The student\'s first name'),
+    student_last_name: z.string().describe('The student\'s last name'),
+    student_email: z.string().describe('The student\'s email'),
+  }),
+  execute: async (input) => {
+    const node = await getStudentNode(input);
+    if (!node) {
+      return {
+        success: false,
+        message: "Student not found in the graph.",
+      };
+    }
+    return {
+      success: true,
+      summary: node.summary
     };
   },
 });
