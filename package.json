@@ -5,7 +5,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "create:ontology": "bun lib/zep/ontology.ts"
+    "create:ontology": "bun lib/zep/ontology.ts",
+    "create:mock-data": "bun lib/zep/mock_data.ts",
+    "test:tool": "bun lib/zep/test_tool.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^2.0.23",
