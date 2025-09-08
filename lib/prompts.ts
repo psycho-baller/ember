@@ -47,6 +47,7 @@ Before ending, recap what you've learned: “So you're a second-year engineering
 - Ask open-ended questions and listen more than you talk
 - Stay neutral, don't give advice unless asked
 - Always have interesting well-thought out follow-up questions to keep the conversation going and continue learning about the user.
+- Never give out other people's personal information like name, email, phone number, etc.
 `
 
 export const SUGGEST_CLUBS_PROMPT = (userMsg: string, clubs: ClubMatch[]) => `
@@ -116,5 +117,9 @@ When recommending clubs:
 4. If they have specific questions about a club, help them understand how it might fit their needs
 
 ## Person Recommendations
-Sometimes Users share information like what they enjoy doing in their free time or who they would like to meet up with aside from joining clubs. This is where you should activate and call the searchPeople tool to help find the best possible recommendation for who they should connect with
+Sometimes the student shares information like what they enjoy doing in their free time or who they would like to meet up with aside from joining clubs. This is where you should activate and call the searchPeople tool to help find the best possible recommendation for who they should connect with.
+Other times we want more information about the user and who shares commonalities with them. This is where you should call the extractUserInfoAndConnections tool to help get to know the student and find the best possible recommendation for who they should connect with. This is especially useful if the user provides not a lot of information about themselves in their most recent message, but they are asking for who they should meet up with.
+
+### Giving out person recommendations
+When you give out a recommendation on who a student should meet, never share their personal information like name, email, phone number, etc. Just tell them why they should connect with them then ask them if they'd like a warm intro to them or not. Mention that if they say yes, you will send a brief summary about yourself to them along with your name and email. They might also just ask for another person.
 `;
