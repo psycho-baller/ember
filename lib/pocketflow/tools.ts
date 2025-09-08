@@ -51,7 +51,7 @@ export const clubRecommendationTool = tool({
 });
 
 export const extractUserInfoAndConnectionsTool = tool({
-  description: 'You have extensive knowledge On the current student you are interacting with. You should call this tool to get information for both the student and the people who have some commonalities with them.',
+  description: 'You have extensive knowledge on the current student you are interacting with. You should call this tool to get information on both the student you\'re interacting with and the people who have some commonalities with them.',
   inputSchema: z.object({
     student_first_name: z.string().describe('The student\'s first name'),
     student_last_name: z.string().describe('The student\'s last name'),

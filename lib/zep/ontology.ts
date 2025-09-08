@@ -229,13 +229,13 @@ export const edge_type_map = {
 /** ---------- ENTITY TYPES (<=10 custom) ---------- **/
 
 const Student: EntityType = {
-  description: "University student that is sending messages",
+  description: "University student with their id, first name, last name, email, and phone number as attributes/properties for the student entity. The entity name should be {first_name} {last_name}",
   fields: {
-    student_id: entityFields.text("Student ID"),
-    student_first_name: entityFields.text("Student first name"),
-    student_last_name: entityFields.text("Student last name"),
-    student_email: entityFields.text("Student email"),
-    student_phone: entityFields.text("Student phone"),
+    id: entityFields.text("Student ID"),
+    first_name: entityFields.text("Student first name"),
+    last_name: entityFields.text("Student last name"),
+    email: entityFields.text("Student email address"),
+    phone: entityFields.text("Student phone number"),
   },
 };
 
@@ -484,6 +484,16 @@ async function createOntology() {
     apiKey: process.env.ZEP_API_KEY,
   });
 
+  const graphId = process.env.ZEP_GRAPH_ID || "all_users";
+
+  // create graph if it doesn't exist
+  try {
+    await client.graph.get(graphId);
+  } catch (e) {
+    console.log(`Graph does not exist, creating graph ${graphId}`);
+    await client.graph.create({ graphId });
+  }
+
   const ontology = await client.graph.setOntology(
     {
       Student,
@@ -513,7 +523,7 @@ async function createOntology() {
       // MATCH_RECOMMENDED,
     },
     {
-      graphIds: [process.env.ZEP_GRAPH_ID || "all_users"]
+      graphIds: [graphId]
     }
   );
 

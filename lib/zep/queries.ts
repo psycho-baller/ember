@@ -107,7 +107,10 @@ type ExtractUserInfoAndConnectionsResult = {
   success: boolean;
   message?: string;
   userInfo?: unknown;
-  connections?: Zep.EntityNode[];
+  connections?: {
+    uuid: string;
+    summary: string;
+  }[];
 };
 
 export async function extractUserInfoAndConnections(
@@ -157,11 +160,16 @@ export async function extractUserInfoAndConnections(
     }
   }
 
+  // remove the attributes that we don't wanna share to the AI
+  const essentialStudentData = otherStudentNodes.map((node) => ({
+    uuid: node.uuid,
+    summary: node.summary.replace(node.name, "").replace(node.attributes?.email as string, "").replace(node.attributes?.phone as string, "").replace(`$${node.name.split(".").join(".").toLowerCase()}`, ""),
+  }));
   // TODO: get the number of shared edges between me and the other students
   // TODO: retrieve the context of the edges between me and the other students
   return {
     success: true,
     userInfo: user.summary,
-    connections: otherStudentNodes,
+    connections: essentialStudentData,
   };
 }
