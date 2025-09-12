@@ -1,6 +1,4 @@
 import { ZepClient, EntityType, EdgeType, entityFields } from "@getzep/zep-cloud";
-import { EntityEdgeSourceTarget } from "@getzep/zep-cloud/serialization";
-import client from "openai";
 // Entity Interfaces
 
 export interface Student {

@@ -163,7 +163,13 @@ export async function extractUserInfoAndConnections(
   // remove the attributes that we don't wanna share to the AI
   const essentialStudentData = otherStudentNodes.map((node) => ({
     uuid: node.uuid,
-    summary: node.summary.replace(node.name, "").replace(node.attributes?.email as string, "").replace(node.attributes?.phone as string, "").replace(`$${node.name.split(".").join(".").toLowerCase()}`, ""),
+    // remove phone numbers in various formats (e.g., (123) 456-7890, 123-456-7890, 123.456.7890, 1234567890)
+    summary: node.summary
+      .replaceAll(/(\+\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/g, '') // remove phone numbers in various formats (e.g., (123) 456-7890)
+      .replaceAll(/\b\d{3}[-.\s]?\d{3}[-.\s]?\d{4}\b/g, '') // remove phone numbers in various formats (e.g., 123-456-7890)
+      .replaceAll(/\b\d{10}\b/g, '') // remove phone numbers in various formats (e.g., 1234567890)
+      .replaceAll(node.attributes?.phone as string | undefined ?? '', '')
+      .trim(),
   }));
   // TODO: get the number of shared edges between me and the other students
   // TODO: retrieve the context of the edges between me and the other students
