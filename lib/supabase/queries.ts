@@ -145,3 +145,15 @@ export async function searchClubs(opts: {
   // Data already includes similarity; ensure typing
   return (data ?? []) as ClubMatch[];
 }
+
+export async function checkIfIntroExists(from_email: string, to_email: string): Promise<boolean> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('warm_intros')
+    .select('id')
+    .eq('from_email', from_email)
+    .eq('to_email', to_email)
+    .single();
+  if (error) return false;
+  return true;
+}
