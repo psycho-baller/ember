@@ -59,6 +59,7 @@ export async function runSessionedFlow(args: {
   shared.user.phone = fromPhone.replace(/^whatsapp:/, "");
   if (!shared.user.firstName && profileName) {
     shared.user.firstName = profileName.split(" ")[0];
+    shared.user.lastName = profileName.split(" ")[1];
   }
   shared.incomingMessage = message;
   shared.aiResponse = undefined;
