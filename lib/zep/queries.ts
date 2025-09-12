@@ -7,7 +7,7 @@ export async function searchPeople(opts: {
   minSimilarity?: number
   keyword?: string | null;
 }): Promise<Zep.EntityNode[]> {
-  const { query, k = 8, minSimilarity = 0.3, keyword = null } = opts;
+  const { query, k = 8, minSimilarity = 0.2, keyword = null } = opts;
 
   const results = await client.graph.search({
     graphId: process.env.ZEP_GRAPH_ID,
@@ -21,8 +21,6 @@ export async function searchPeople(opts: {
     // minScore
     // Optionally, you can add reranker or edge_types if you want more control
   });
-
-  console.log("Search results:", results);
 
   // remove the node that has a score of 1 because that's the user
   results.nodes = results.nodes?.filter((node) => node.score !== 1);

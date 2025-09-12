@@ -2,7 +2,7 @@ import { ModelMessage } from "ai";
 import { log } from "console";
 import { callLlmJson, callLlm } from "../llm";
 import { EXTRACT_USER_INFO_FOR_CLUB_MATCHING_PROMPT, SUGGEST_CLUBS_PROMPT } from "../prompts";
-import { checkIfIntroExists, createWarmIntro, getPhoneNumberByEmail, getUserIdByEmail, searchClubs } from "../supabase/queries";
+import { checkIfIntroExists, createWarmIntro, getPhoneNumberByEmail, searchClubs } from "../supabase/queries";
 import { sendWhatsAppMessage } from "../twilio";
 import { z } from "zod";
 
