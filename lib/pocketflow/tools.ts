@@ -85,7 +85,10 @@ export const personRecommendationTool = tool({
 
     console.log("Search query:", searchQuery);
 
-    const people = await searchPeople({ query: searchQuery });
+    let people = await searchPeople({ query: searchQuery });
+    // remove nodes that contain the name of the user
+    people = people.filter((person) => firstName && !person.name.trim().toLowerCase().includes(firstName.trim().toLowerCase()));
+    console.log("People:", people);
     if (people.length === 0) {
       return {
         success: false,
