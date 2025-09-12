@@ -6,6 +6,7 @@ import { useEmailSignup } from "@/hooks/use-email-signup";
 import { isValidUniversityEmail, getEmailValidationError } from "@/lib/email-utils";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import { env } from "@/lib/constants";
 
 const CTASection = () => {
   const [email, setEmail] = useState("");
@@ -88,7 +89,7 @@ const CTASection = () => {
                 <div className="flex items-center bg-background/50 backdrop-blur-xs rounded-full border border-border/50 p-1 max-w-md mx-auto">
                   <Input
                     type="email"
-                    placeholder="your@ucalgary.ca"
+                    placeholder={`your@${env.LOCATION_ID === "uofc" ? "ucalgary" : "uwaterloo"}.ca`}
                     value={email}
                     onChange={(e) => {
                       setEmail(e.target.value);

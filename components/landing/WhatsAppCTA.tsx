@@ -1,9 +1,10 @@
 import { MessageCircle } from "lucide-react";
+import { env } from "@/lib/constants";
 
 const WhatsAppCTA = () => {
   const handleWhatsAppClick = () => {
     // Replace with actual WhatsApp number/link
-    const message = encodeURIComponent("Hey! I'm interested in Ember at UCalgary 🚀");
+    const message = encodeURIComponent(`Hey! I'm interested in Ember at ${env.LOCATION_ID === "uofc" ? "UCalgary" : "UWaterloo"} 🚀`);
     const whatsappUrl = `https://wa.me/1234567890?text=${message}`;
     window.open(whatsappUrl, '_blank');
   };

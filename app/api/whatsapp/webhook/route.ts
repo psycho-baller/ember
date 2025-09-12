@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { validateRequest } from 'twilio';
 import { twilioClient } from '@/lib/twilio';
 import { runSessionedFlow } from '@/lib/pocketflow/flow';
+import { env } from '@/lib/constants';
 
 export async function POST(request: Request) {
   try {
@@ -46,7 +47,7 @@ export async function POST(request: Request) {
     if (message.toLowerCase() === "hey what's all this about?") {
       // await new Promise((resolve) => setTimeout(resolve, 1000));
       await twilioClient.messages.create({
-        body: `hey${firstName ? ` ${firstName}` : ''} i'm Ember, UCalgary's AI superconnector.
+        body: `hey${firstName ? ` ${firstName}` : ''} i'm ember, ${env.LOCATION_ID === "uofc" ? "ucalgary" : "uwaterloo"}'s AI superconnector.
 
 I help you find exactly who/what you're looking for. Whether that's a friend, a club, a group project partner, a mentor, or even your next date😏
 
@@ -60,7 +61,7 @@ Here's how it works:
         to: from
       });
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      return new NextResponse("<Response><Message>oh and also make sure you confirm your ucalgary email with the link I sent you</Message></Response>", {
+      return new NextResponse(`<Response><Message>oh and also make sure you confirm your ${env.LOCATION_ID === "uofc" ? "ucalgary" : "uwaterloo"} email with the link I sent you</Message></Response>`, {
         headers: { 'Content-Type': 'text/xml' },
       });
     }

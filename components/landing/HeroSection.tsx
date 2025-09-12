@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import WhatsAppButton from "../WhatsAppButton";
+import { env } from "@/lib/constants";
 
 const HeroSection = () => {
   const [email, setEmail] = useState("");
@@ -54,7 +55,7 @@ const HeroSection = () => {
       <div className="relative z-10 text-center max-w-7xl mx-auto">
         <div className="mb-8 animate-fade-in">
           <h1 className="text-4xl sm:text-5xl md:text-7xl 2xl:text-8xl font-display font-bold mb-1 sm:mb-2 md:mb-4">
-          I&apos;m Ember, your{" "}
+          I&apos;m Ember, your AI{" "}
             <span className="bg-linear-to-r from-primary to-accent-custom bg-clip-text text-transparent">
               university superconnector
             </span>
@@ -85,7 +86,7 @@ const HeroSection = () => {
                 <div className="flex items-center bg-background/50 backdrop-blur-xs rounded-full border border-border/50 p-1">
                   <Input
                     type="email"
-                    placeholder="your@ucalgary.ca"
+                    placeholder={`your@${env.LOCATION_ID === "uofc" ? "ucalgary" : "uwaterloo"}.ca`}
                     value={email}
                     onChange={(e) => {
                       setEmail(e.target.value);
@@ -111,7 +112,7 @@ const HeroSection = () => {
                 )}
               </div>
               <p className="text-xs text-muted-foreground mt-2 text-center">
-                Enter your University of Calgary email to get started
+                Enter your University of {env.LOCATION_ID === "uofc" ? "Calgary" : "Waterloo"} email to get started
               </p>
             </form>
           </motion.div>

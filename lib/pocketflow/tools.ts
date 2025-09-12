@@ -3,9 +3,10 @@ import { z } from 'zod';
 import { searchClubs } from "../supabase/queries";
 import { figureOutIntention, sendWarmIntro } from "./utils";
 import { extractUserInfoAndConnections, getStudentNode, searchPeople } from "../zep/queries";
+import { env } from "../constants";
 
 export const clubRecommendationTool = tool({
-  description: 'You have extensive knowledge on all the clubs in the University of Calgary, and your goal is to provide information on university clubs in UCalgary. Whether the student is looking for clubs that match their interests and preferences or just want to learn more about a club. You should use this tool to get the information needed to answer the user\'s query appropriately.',
+  description: `You have extensive knowledge on all the clubs in the University of ${env.LOCATION_ID === "uofc" ? "Calgary" : "Waterloo"}, and your goal is to provide information on university clubs in ${env.LOCATION_ID === "uofc" ? "UCalgary" : "UWaterloo"}. Whether the student is looking for clubs that match their interests and preferences or just want to learn more about a club. You should use this tool to get the information needed to answer the user\'s query appropriately.`,
   inputSchema: z.object({
     intent: z.enum(['club_recommendation', 'club_info']),
     keyInfo: z.string().describe("The key information that we need. Whether it's the user looking for clubs that match their interests and preferences or just want to learn more about a club. Make it very thorough and accurate."),
@@ -62,7 +63,7 @@ export const extractUserInfoAndConnectionsTool = tool({
 })
 
 export const personRecommendationTool = tool({
-  description: 'You have extensive knowledge on all the people in the University of Calgary, and your goal is to help provide the user with the best possible recommendation for who they should connect with',
+  description: `You have extensive knowledge on all the people in the University of ${env.LOCATION_ID === "uofc" ? "Calgary" : "Waterloo"}, and your goal is to help provide the user with the best possible recommendation for who they should connect with`,
   inputSchema: z.object({
     intention: z.enum(['friendship', 'romantic', 'mentor', 'mentee', 'gym_buddy', 'group_project', 'other']).describe("What kind of relationship is the user looking for?"),
     // keyInfo: z.string().describe('The key information that we need to help find the best possible recommendation for who they should connect with. Make it very thorough and accurate. E.g. "I would like to meet people in the gym who like improv" -> "Rami enjoys improv  likes to meet people in the gym"'),
@@ -116,7 +117,7 @@ export const personRecommendationTool = tool({
  * get summary of student from zep data
  */
 export const getStudentSummaryTool = tool({
-  description: 'You have extensive knowledge on all the people in the University of Calgary, and your goal is to help provide the user with the best possible recommendation for who they should connect with',
+  description: `You have extensive knowledge on all the people in the University of ${env.LOCATION_ID === "uofc" ? "Calgary" : "Waterloo"}, and your goal is to help provide the user with the best possible recommendation for who they should connect with`,
   inputSchema: z.object({
     student_first_name: z.string().describe('The student\'s first name'),
     student_last_name: z.string().describe('The student\'s last name'),

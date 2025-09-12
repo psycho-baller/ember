@@ -1,4 +1,5 @@
 import { ZepClient, EntityType, EdgeType, entityFields } from "@getzep/zep-cloud";
+import { env } from "../constants";
 // Entity Interfaces
 
 export interface Student {
@@ -238,7 +239,7 @@ const Student: EntityType = {
 };
 
 const Program: EntityType = {
-  description: "Academic program or major at University of Calgary",
+  description: `Academic program or major at University of ${env.LOCATION_ID === "uofc" ? "Calgary" : "Waterloo"}`,
   fields: {
     code: entityFields.text("Program code, e.g., CPSC."),
     // name: entityFields.text("Program name, e.g., Computer Science."),
@@ -247,7 +248,7 @@ const Program: EntityType = {
 };
 
 const Course: EntityType = {
-  description: "Specific course offering at University of Calgary",
+  description: `Specific course offering at University of ${env.LOCATION_ID === "uofc" ? "Calgary" : "Waterloo"}`,
   fields: {
     code: entityFields.text("Catalog code, e.g., PSYC 325."),
   },
@@ -275,7 +276,7 @@ const Goal: EntityType = {
 };
 
 const Dorm: EntityType = {
-  description: "A dormitory building in University of Calgary campus. For example, Student('Bob') -> RESIDES_IN -> Dorm('KA')",
+  description: `A dormitory building in University of ${env.LOCATION_ID === "uofc" ? "Calgary" : "Waterloo"} campus. For example, Student('Bob') -> RESIDES_IN -> Dorm('KA')`,
   fields: {
     code: entityFields.text("Dorm code, here's a list of dorms and their associated codes:'Kananaskis Hall'->'KA','Rundle Hall'->'RU','International House'->'IH','Yamnuska Hall'->'YA','Cascade Hall'->'CD','Aurora Hall'->'AU','Glacier Hall'->'GL','Olympus Hall'->'OL','Crowsnest Hall'->'CR','Varsity Courts'->'VC'"),
   },
@@ -317,7 +318,7 @@ const baseEdgeFields = {
 };
 
 const ENROLLED_IN: EdgeType = {
-  description: "Represents that the user is enrolled in a specific course offered at University of Calgary. For example, Student('Bob') -> ENROLLED_IN -> Course('PSYC 325')",
+  description: `Represents that the user is enrolled in a specific course offered at University of ${env.LOCATION_ID === "uofc" ? "Calgary" : "Waterloo"}. For example, Student('Bob') -> ENROLLED_IN -> Course('PSYC 325')`,
   fields: {
     ...baseEdgeFields,
     term: entityFields.text("Term identifier, e.g., F25, W26, P26, S26, etc."),
@@ -328,7 +329,7 @@ const ENROLLED_IN: EdgeType = {
 };
 
 const BELONGS_TO: EdgeType = {
-  description: "Represents that the course belongs to a specific program/major at University of Calgary. For example, Course('PSYC 325') -> BELONGS_TO -> Program('PSYC')",
+  description: `Represents that the course belongs to a specific program/major at University of ${env.LOCATION_ID === "uofc" ? "Calgary" : "Waterloo"}. For example, Course('PSYC 325') -> BELONGS_TO -> Program('PSYC')`,
   fields: {
     ...baseEdgeFields,
     // type: entityFields.text("Program, e.g., cafe, lunch, walk, gym, etc."),
@@ -337,7 +338,7 @@ const BELONGS_TO: EdgeType = {
 };
 
 const STUDIES_IN: EdgeType = {
-  description: "Represents that the user studies in a specific program/major at University of Calgary. For example, Student('Bob') -> STUDIES_IN -> Program('PSYC')",
+  description: `Represents that the user studies in a specific program/major at University of ${env.LOCATION_ID === "uofc" ? "Calgary" : "Waterloo"}. For example, Student('Bob') -> STUDIES_IN -> Program('PSYC')`,
   fields: {
     ...baseEdgeFields,
     // type: entityFields.text("Program, e.g., cafe, lunch, walk, gym, etc."),
@@ -355,7 +356,7 @@ const SPEAKS: EdgeType = {
 };
 
 const RESIDES_IN: EdgeType = {
-  description: "Represents that the user resides in a specific dormitory building at University of Calgary. For example, Student('David') -> RESIDES_IN -> Dorm('KA')",
+  description: `Represents that the user resides in a specific dormitory building at University of ${env.LOCATION_ID === "uofc" ? "Calgary" : "Waterloo"}. For example, Student('David') -> RESIDES_IN -> Dorm('KA')`,
   fields: {
     ...baseEdgeFields,
     // type: entityFields.text("Dorm, e.g., cafe, lunch, walk, gym, etc."),
