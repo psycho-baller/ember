@@ -61,6 +61,50 @@ export async function saveSharedStore(sessionId: string, shared: SharedStore, pr
 }
 
 
+// ---- Warm intros -----------------------------------------------------------
+export async function createWarmIntro(input: {
+  from_first_name: string;
+  from_last_name: string;
+  from_email: string;
+  to_first_name: string;
+  to_last_name: string;
+  to_email: string;
+  intro_message: string;
+  delivery_medium?: 'email' | 'whatsapp';
+}): Promise<{ id: string } | null> {
+  const supabase = await createClient();
+
+  // Resolve profile ids by email
+  const fromId = await getUserIdByEmail(input.from_email);
+  const toId = await getUserIdByEmail(input.to_email);
+  if (!fromId || !toId) {
+    throw new Error('Unable to resolve profile ids for provided emails');
+  }
+
+  const payload = {
+    from_profile_id: fromId,
+    to_profile_id: toId,
+    from_first_name: input.from_first_name,
+    from_last_name: input.from_last_name,
+    from_email: input.from_email,
+    to_first_name: input.to_first_name,
+    to_last_name: input.to_last_name,
+    to_email: input.to_email,
+    intro_message: input.intro_message,
+    delivery_medium: input.delivery_medium ?? 'whatsapp',
+  };
+
+  const { data, error } = await supabase
+    .from('warm_intros')
+    .insert(payload)
+    .select('id')
+    .single();
+
+  if (error) throw error;
+  return data as { id: string };
+}
+
+
 
 // ---- 1) Vector search: embed the query, call Supabase RPC, return matches ----
 /**
