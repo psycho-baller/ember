@@ -2,7 +2,7 @@ import { ModelMessage } from "ai";
 import { log } from "console";
 import { callLlmJson, callLlm } from "../llm";
 import { EXTRACT_USER_INFO_FOR_CLUB_MATCHING_PROMPT, SUGGEST_CLUBS_PROMPT } from "../prompts";
-import { searchClubs } from "../supabase/queries";
+import { checkIfIntroExists, createWarmIntro, searchClubs } from "../supabase/queries";
 import { sendWhatsAppMessage } from "../twilio";
 import { z } from "zod";
 
@@ -112,5 +112,55 @@ export function figureOutIntention(intention: string): string {
       return 'find a group project partner';
     default:
       return 'find someone else';
+  }
+}
+
+/**
+ * Send a warm intro to a student.
+ * But first check if the student has already sent an intro to the user. If so, do not send another intro.
+ *
+ * @param input all the necessary information to send a warm intro and insert it into the database
+ * @returns message to the AI to let it know if the intro was sent successfully or not
+ */
+export async function sendWarmIntro(input: { from_first_name: string; from_last_name: string; from_email: string; to_first_name: string; to_last_name: string; to_email: string; warm_intro: string; }) {
+  try {
+    const introExists = await checkIfIntroExists(input.from_email, input.to_email);
+    if (introExists) {
+      return {
+        success: false,
+        message: `An intro has already been sent to ${input.to_email}`
+      };
+    }
+    // check if their email shows up in the message. if not add it to the message
+    if (!input.warm_intro.includes(input.to_email)) {
+      input.warm_intro += `\nYou can reach them at ${input.to_email}`;
+    }
+    const message = await sendWhatsAppMessage(input.to_email, input.warm_intro);
+    console.log("Intro sent successfully", message);
+    if (message.errorCode) {
+      return {
+        success: false,
+        message: `Failed to send intro. Error code: ${message.errorCode}`
+      };
+    }
+    await createWarmIntro({
+      from_first_name: input.from_first_name,
+      from_last_name: input.from_last_name,
+      from_email: input.from_email,
+      to_first_name: input.to_first_name,
+      to_last_name: input.to_last_name,
+      to_email: input.to_email,
+      intro_message: input.warm_intro,
+      delivery_medium: 'whatsapp'
+    });
+    return {
+      success: true,
+      message: "Intro sent successfully"
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: `Failed to send intro. Error: ${error}`
+    };
   }
 }

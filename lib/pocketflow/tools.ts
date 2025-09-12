@@ -1,7 +1,7 @@
 import { tool } from "ai";
 import { z } from 'zod';
 import { searchClubs } from "../supabase/queries";
-import { figureOutIntention } from "./utils";
+import { figureOutIntention, sendWarmIntro } from "./utils";
 import { extractUserInfoAndConnections, getStudentNode, searchPeople } from "../zep/queries";
 
 export const clubRecommendationTool = tool({
@@ -132,4 +132,21 @@ export const getStudentSummaryTool = tool({
       summary: node.summary
     };
   },
+});
+
+/**
+ * Send out a warm intro from a student to another student
+ */
+export const sendWarmIntroTool = tool({
+  description: 'You are an expert at sending warm intros from a student who is interested in meeting another student who shares commonalities with them. You should use this tool once a user confirms they want you (the ai) to send out a warm intro to the student they want to connect with.',
+  inputSchema: z.object({
+    from_first_name: z.string().describe('The student who requested the intro\'s first name'),
+    from_last_name: z.string().describe('The student who requested the intro\'s last name'),
+    from_email: z.string().describe('The student who requested the intro\'s email'),
+    to_first_name: z.string().describe('The person who the intro is for\'s first name'),
+    to_last_name: z.string().describe('The person who the intro is for\'s last name'),
+    to_email: z.string().describe('The person who the intro is for\'s email'),
+    warm_intro: z.string().describe('The message that will be sent to the person who the intro is for. Remember you are very close friends with these 2 students and is very confident that they will get along very well. So construct a message that will make them want to connect with each other. You can do that by being very detailed with what they have in common and anything that would give them a good reason to reach out. Be expressive in the information you share as long as it doesn\'t invade their privacy. Share as many information that is common between the two. Focus on that. For e.g. if both users were studying the same major or both enjoy a certain hobby, make sure you include that in the recommendation message.'),
+  }),
+  execute: async (input) => sendWarmIntro(input),
 });
