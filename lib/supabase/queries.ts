@@ -17,11 +17,47 @@ export async function fetchCandidateEmails(firstName: string): Promise<string[]>
 
 export async function getUserIdByEmail(email: string): Promise<string | null> {
   const supabase = await createClient();
+  // mock emails for testing
+  if (process.env.ZEP_GRAPH_ID?.includes("mock")) {
+    if (email === "chris.thompson@ucalgary.ca") return process.env.REAL_MOCK_USER_ID!;
+    if (email === "alice.smith@ucalgary.ca") return process.env.REAL_MOCK_USER_ID!;
+    if (email === "bob.johnson@ucalgary.ca") return process.env.POP_USER_ID!;
+    if (email === "jamie.lee@ucalgary.ca") return process.env.REAL_MOCK_USER_ID!;
+    if (email === "alex.kim@ucalgary.ca") return process.env.REAL_MOCK_USER_ID!;
+    if (email === "henry.davis@ucalgary.ca") return process.env.REAL_MOCK_USER_ID!;
+    return process.env.REAL_MOCK_USER_ID!;
+  }
+
   const { data, error } = await supabase.rpc("get_user_id_by_email", {
     p_email: email,
   });
   if (error) return null;
   return data ?? null; // data is uuid or null
+}
+
+export async function getPhoneNumberById(id: string): Promise<string | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.from('profiles').select('phone_number').eq('id', id).single();
+  if (error) return null;
+  return data?.phone_number ?? null;
+}
+
+export async function getPhoneNumberByEmail(email: string): Promise<string | null> {
+  // mock emails for testing
+  if (process.env.ZEP_GRAPH_ID?.includes("mock")) {
+    if (email === "chris.thompson@ucalgary.ca") return process.env.RAMI_PHONE_NUMBER!;
+    if (email === "alice.smith@ucalgary.ca") return process.env.RAMI_PHONE_NUMBER!;
+    if (email === "bob.johnson@ucalgary.ca") return process.env.RAMI_PHONE_NUMBER!;
+    if (email === "jamie.lee@ucalgary.ca") return process.env.RAMI_PHONE_NUMBER!;
+    if (email === "alex.kim@ucalgary.ca") return process.env.RAMI_PHONE_NUMBER!;
+    if (email === "henry.davis@ucalgary.ca") return process.env.RAMI_PHONE_NUMBER!;
+    return process.env.RAMI_PHONE_NUMBER!;
+  }
+
+  const supabase = await createClient();
+  const { data, error } = await supabase.from('profiles').select('phone_number').eq('email', email).single();
+  if (error) return null;
+  return data?.phone_number ?? null;
 }
 
 export async function linkPhoneToProfile(email: string, phone: string): Promise<string> {
@@ -78,18 +114,18 @@ export async function createWarmIntro(input: {
   const fromId = await getUserIdByEmail(input.from_email);
   const toId = await getUserIdByEmail(input.to_email);
   if (!fromId || !toId) {
-    throw new Error('Unable to resolve profile ids for provided emails');
+    throw new Error(`Unable to find user with email $${input.to_email}`);
   }
 
   const payload = {
     from_profile_id: fromId,
     to_profile_id: toId,
-    from_first_name: input.from_first_name,
-    from_last_name: input.from_last_name,
-    from_email: input.from_email,
-    to_first_name: input.to_first_name,
-    to_last_name: input.to_last_name,
-    to_email: input.to_email,
+    // from_first_name: input.from_first_name,
+    // from_last_name: input.from_last_name,
+    // from_email: input.from_email,
+    // to_first_name: input.to_first_name,
+    // to_last_name: input.to_last_name,
+    // to_email: input.to_email,
     intro_message: input.intro_message,
     delivery_medium: input.delivery_medium ?? 'whatsapp',
   };
