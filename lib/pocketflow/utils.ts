@@ -2,7 +2,7 @@ import { ModelMessage } from "ai";
 import { log } from "console";
 import { callLlmJson, callLlm } from "../llm";
 import { EXTRACT_USER_INFO_FOR_CLUB_MATCHING_PROMPT, SUGGEST_CLUBS_PROMPT } from "../prompts";
-import { checkIfIntroExists, createWarmIntro, searchClubs } from "../supabase/queries";
+import { checkIfIntroExists, createWarmIntro, getPhoneNumberByEmail, getUserIdByEmail, searchClubs } from "../supabase/queries";
 import { sendWhatsAppMessage } from "../twilio";
 import { z } from "zod";
 
@@ -125,6 +125,7 @@ export function figureOutIntention(intention: string): string {
 export async function sendWarmIntro(input: { from_first_name: string; from_last_name: string; from_email: string; to_first_name: string; to_last_name: string; to_email: string; warm_intro: string; }) {
   try {
     const introExists = await checkIfIntroExists(input.from_email, input.to_email);
+    console.log("Intro exists", introExists);
     if (introExists) {
       return {
         success: false,
@@ -132,12 +133,24 @@ export async function sendWarmIntro(input: { from_first_name: string; from_last_
       };
     }
     // check if their email shows up in the message. if not add it to the message
-    if (!input.warm_intro.includes(input.to_email)) {
-      input.warm_intro += `\nYou can reach them at ${input.to_email}`;
+    if (!input.warm_intro.includes(input.from_email)) {
+      input.warm_intro += `\nYou can reach them at ${input.from_email}`;
     }
-    const message = await sendWhatsAppMessage(input.to_email, input.warm_intro);
+
+    console.log("Sending intro to", input.to_email);
+    const phoneNumber = await getPhoneNumberByEmail(input.to_email);
+    console.log("Phone number", phoneNumber);
+    if (!phoneNumber) {
+      return {
+        success: false,
+        message: `Failed to send intro. Phone number not found for ${input.to_email}`
+      };
+    }
+
+    const message = await sendWhatsAppMessage(phoneNumber, input.warm_intro);
     console.log("Intro sent successfully", message);
-    if (message.errorCode) {
+
+    if (!message.sid) {
       return {
         success: false,
         message: `Failed to send intro. Error code: ${message.errorCode}`
