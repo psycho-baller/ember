@@ -107,12 +107,14 @@ export function pickBestEmail(firstName: string, candidates: string[]): string |
 
 
   const expectedPrefix = `${firstName.toLowerCase()}.`;
-  const ratings = stringSimilarity.findBestMatch(
-    expectedPrefix,
-    candidates.map((e) => e.split("@")[0])
-  );
-  const bestIdx = ratings.bestMatchIndex;
-  return candidates[bestIdx];
+  // Compare against candidate keys (first segment before a dot), and on ties
+  // prefer the first candidate in the original list deterministically.
+  const keys = candidates.map((e) => e.split("@")[0].split(".")[0]);
+  const scores = keys.map((k) => stringSimilarity.compareTwoStrings(expectedPrefix, k));
+  const max = Math.max(...scores);
+  const EPS = 1e-6; // treat very close scores as equal
+  const bestIdx = scores.findIndex((s) => max - s <= EPS);
+  return candidates[bestIdx >= 0 ? bestIdx : 0];
 }
 
 export function looksLikeEmail(s?: string) {
