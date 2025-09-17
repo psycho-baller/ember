@@ -12,7 +12,7 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "Ember AI - Your AI uni superconnector",
+  title: "Ember - Your AI uni superconnector",
   description: "Your AI superconnector I help you find exactly who you\'re looking for as you go through your day",
 };
 
