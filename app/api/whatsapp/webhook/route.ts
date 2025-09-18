@@ -61,12 +61,12 @@ Here's how it works:
 P.S. I currently have a bug in my system. I'll get back to you in a few minutes once I'm fixed!
 `
       const secondMessage = `oh and also make sure you confirm your ${env.LOCATION_ID === "uofc" ? "ucalgary" : "uwaterloo"} email with the link I sent you`;
-      await twilioClient.messages.create({
-        body: firstMessage,
-        from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
-        to: from
-      });
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // await twilioClient.messages.create({
+      //   body: firstMessage,
+      //   from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
+      //   to: from
+      // });
+      // await new Promise((resolve) => setTimeout(resolve, 1000));
       return new NextResponse(`<Response><Message>${firstMessage}</Message></Response>`, {
         headers: { 'Content-Type': 'text/xml' },
       });
