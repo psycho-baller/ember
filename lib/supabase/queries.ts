@@ -3,6 +3,7 @@ import { ClubMatch, SharedStore } from "../pocketflow/types";
 import { embed } from "ai";
 import { openai } from "@ai-sdk/openai";
 import { log } from "console";
+import { env } from "@/lib/env";
 
 export async function fetchCandidateEmails(firstName: string): Promise<string[]> {
   const supabase = await createClient();
@@ -153,7 +154,7 @@ export async function searchClubs(opts: {
   query: string;
   k?: number;                  // top-k, default 8
   minSimilarity?: number;      // 0..1 cosine-based similarity threshold
-  keyword?: string | null;     // optional hybrid keyword filter
+  keyword?: string | null;     // optional hybrid keyword filtero
 }): Promise<ClubMatch[]> {
   const supabase = await createClient();
 
@@ -171,6 +172,7 @@ export async function searchClubs(opts: {
     match_count: k,
     min_similarity: minSimilarity,
     keyword,
+    p_university: env.LOCATION_ID,
   });
   log("searchClubs", { query, k, minSimilarity, keyword, data, error });
 
