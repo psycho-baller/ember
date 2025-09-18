@@ -46,8 +46,7 @@ export async function POST(request: Request) {
 
     if (message.toLowerCase() === "hey what's all this about?") {
       // await new Promise((resolve) => setTimeout(resolve, 1000));
-      await twilioClient.messages.create({
-        body: `hey${firstName ? ` ${firstName}` : ''} i'm ember, ${env.LOCATION_ID === "uofc" ? "ucalgary" : "uwaterloo"}'s AI superconnector.
+      const firstMessage = `hey${firstName ? ` ${firstName}` : ''} i'm ember, ${env.LOCATION_ID === "uofc" ? "ucalgary" : "uwaterloo"}'s AI superconnector.
 
 I help you find exactly who/what you're looking for. Whether that's a friend, a club, a group project partner, a mentor, or even your next date😏
 
@@ -56,12 +55,18 @@ Here's how it works:
 1. We chat or call (yes, you can call me) so I get to know you a lil more and who you're hoping to meet.
 2. I build a connection profile that reflects who you are and who you want to meet.
 3. Then I find someone on campus who matches that vibe and fits your schedule (a.k.a we'll try to match you with someone who's in your class, or who goes to the same lunch area as you)
-4. I share your profiles (only if you both approve), and set up a group chat (through email because whatsapp doesn't allow me to do so😔) so y'all can chat and hopefully meet up`,
+4. Once I find a match and you confirm that you're interested, I send them a warm intro message about you and ask them to reach out to you.
+
+P.S. I currently have a bug in my system. I'll get back to you in a few minutes once I'm fixed!
+`
+      const secondMessage = `oh and also make sure you confirm your ${env.LOCATION_ID === "uofc" ? "ucalgary" : "uwaterloo"} email with the link I sent you`;
+      await twilioClient.messages.create({
+        body: firstMessage,
         from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
         to: from
       });
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      return new NextResponse(`<Response><Message>oh and also make sure you confirm your ${env.LOCATION_ID === "uofc" ? "ucalgary" : "uwaterloo"} email with the link I sent you</Message></Response>`, {
+      return new NextResponse(`<Response><Message>${firstMessage}</Message></Response>`, {
         headers: { 'Content-Type': 'text/xml' },
       });
     }
