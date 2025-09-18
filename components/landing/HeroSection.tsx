@@ -112,7 +112,7 @@ const HeroSection = () => {
                 )}
               </div>
               <p className="text-xs text-muted-foreground mt-2 text-center">
-                Enter your{env.LOCATION_ID !== "uofc" ? "Canadian" : ""} University{env.LOCATION_ID === "uofc" ? " of Calgary" : ""} email to get started
+                Enter your University {env.LOCATION_ID === "uofc" ? "of Calgary" : "of Waterloo"} email to get started
               </p>
             </form>
           </motion.div>
