@@ -45,6 +45,7 @@ export async function POST(request: Request) {
     // });
 
     if (message.toLowerCase() === "hey what's all this about?") {
+      console.log("Sending first message", process.env.LOCATION_ID, process.env.TWILIO_PHONE_NUMBER, process.env.NEXT_PUBLIC_LOCATION_ID, env.LOCATION_ID);
       // await new Promise((resolve) => setTimeout(resolve, 1000));
       const firstMessage = `hey${firstName ? ` ${firstName}` : ''} i'm ember, ${env.LOCATION_ID === "uofc" ? "ucalgary" : "uwaterloo"}'s AI superconnector.
 
