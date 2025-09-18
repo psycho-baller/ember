@@ -1,56 +1,21 @@
-// List of common US and Canada TLDs for educational institutions
-const US_CANADA_EDU_TLDS = [
-  // US TLDs
-  '.edu',
-  '.edu.us',
-  '.k12.[state].us', // Will be replaced with state codes
-  '.cc.[state].us',
-  '.pvt.k12.[state].us',
-  
-  // Canada TLDs
-  '.ca',
-  '.on.ca',
-  '.qc.ca',
-  '.bc.ca',
-  '.ab.ca',
-  '.mb.ca',
-  '.sk.ca',
-  '.ns.ca',
-  '.nb.ca',
-  '.nl.ca',
-  '.pe.ca',
-  '.nt.ca',
-  '.nu.ca',
-  '.yt.ca',
-];
+import { env } from './constants';
 
-// US state and territory codes for dynamic TLD generation
-const US_STATE_CODES = [
-  'al', 'ak', 'az', 'ar', 'ca', 'co', 'ct', 'de', 'fl', 'ga',
-  'hi', 'id', 'il', 'in', 'ia', 'ks', 'ky', 'la', 'me', 'md',
-  'ma', 'mi', 'mn', 'ms', 'mo', 'mt', 'ne', 'nv', 'nh', 'nj',
-  'nm', 'ny', 'nc', 'nd', 'oh', 'ok', 'or', 'pa', 'ri', 'sc',
-  'sd', 'tn', 'tx', 'ut', 'vt', 'va', 'wa', 'wv', 'wi', 'wy',
-  'dc', 'as', 'gu', 'mp', 'pr', 'vi'
-];
+// University-specific email domains
+const UNIVERSITY_DOMAINS = {
+  uofc: '@ucalgary.ca',
+  uw: '@uwaterloo.ca'
+} as const;
 
-// Generate all possible US state-based TLDs
-const generateStateBasedTlds = (tldPattern: string): string[] => {
-  return US_STATE_CODES.map(state => tldPattern.replace('[state]', state));
-};
-
-// Generate all possible TLDs
-const ALL_EDU_TLDS = [
-  ...US_CANADA_EDU_TLDS.filter(tld => !tld.includes('[state]')),
-  ...generateStateBasedTlds('.k12.[state].us'),
-  ...generateStateBasedTlds('.cc.[state].us'),
-  ...generateStateBasedTlds('.pvt.k12.[state].us')
-];
+// University names for error messages
+const UNIVERSITY_NAMES = {
+  uofc: 'University of Calgary',
+  uw: 'University of Waterloo'
+} as const;
 
 /**
- * Validates if an email is from a US or Canadian educational institution
+ * Validates if an email is from the current university based on LOCATION_ID
  * @param email The email address to validate
- * @returns boolean indicating if the email is from a valid educational institution
+ * @returns boolean indicating if the email is from the correct university domain
  */
 export const isValidUniversityEmail = (email: string): boolean => {
   // Basic email format validation
@@ -59,11 +24,42 @@ export const isValidUniversityEmail = (email: string): boolean => {
     return false;
   }
 
-  // Extract the domain part of the email
-  const domain = email.split('@')[1]?.toLowerCase() || '';
+  // Get the current university domain based on LOCATION_ID
+  const currentUniversityDomain = UNIVERSITY_DOMAINS[env.LOCATION_ID as keyof typeof UNIVERSITY_DOMAINS];
   
-  // Check if the domain ends with any of the valid TLDs
-  return ALL_EDU_TLDS.some(tld => domain.endsWith(tld));
+  if (!currentUniversityDomain) {
+    return false;
+  }
+
+  // Check if the email ends with the correct university domain
+  return email.toLowerCase().endsWith(currentUniversityDomain);
+};
+
+/**
+ * Determines university from email domain
+ * @param email The email address
+ * @returns university key or null if not recognized
+ */
+export const getUniversityFromEmail = (email: string): keyof typeof UNIVERSITY_DOMAINS | null => {
+  const emailLower = email.toLowerCase();
+  
+  for (const [university, domain] of Object.entries(UNIVERSITY_DOMAINS)) {
+    if (emailLower.endsWith(domain)) {
+      return university as keyof typeof UNIVERSITY_DOMAINS;
+    }
+  }
+  
+  return null;
+};
+
+/**
+ * Checks if email is from the current university context
+ * @param email The email address
+ * @returns boolean indicating if email matches current university
+ */
+export const isFromCurrentUniversity = (email: string): boolean => {
+  const emailUniversity = getUniversityFromEmail(email);
+  return emailUniversity === env.LOCATION_ID;
 };
 
 /**
@@ -77,8 +73,11 @@ export const getEmailValidationError = (email: string): string | null => {
     return 'Please enter a valid email address';
   }
   
+  const currentUniversityName = UNIVERSITY_NAMES[env.LOCATION_ID as keyof typeof UNIVERSITY_NAMES];
+  const currentUniversityDomain = UNIVERSITY_DOMAINS[env.LOCATION_ID as keyof typeof UNIVERSITY_DOMAINS];
+  
   if (!isValidUniversityEmail(email)) {
-    return 'Please use a valid US or Canadian university email address';
+    return `Please use your ${currentUniversityName} email address (${currentUniversityDomain})`;
   }
   
   return null;

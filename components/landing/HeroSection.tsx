@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import WhatsAppButton from "../WhatsAppButton";
 import { env } from "@/lib/constants";
+import { isValidUniversityEmail, getEmailValidationError } from "@/lib/email-utils";
 
 const HeroSection = () => {
   const [email, setEmail] = useState("");
@@ -37,13 +38,20 @@ const HeroSection = () => {
       return;
     }
 
+    // University-specific email validation
+    const validationError = getEmailValidationError(email);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
     try {
       setIsSubmitted(true);
       await signUpWithEmail(email);
       // Show WhatsApp button immediately after successful university email submission
       setShowWhatsAppButton(true);
-    } catch (err) {
-      setError('Failed to process your request. Please try again.');
+    } catch (err: any) {
+      setError(err.message || 'Failed to process your request. Please try again.');
       setShowWhatsAppButton(false);
     } finally {
       setIsSubmitted(false);

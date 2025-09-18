@@ -28,14 +28,11 @@ export const useEmailSignup = () => {
     setIsLoading(true);
     try {
       // Validate university email
-      // if (!isValidUniversityEmail(email)) {
-      //   throw new Error(getEmailValidationError(email) || 'Invalid university email');
-      // }
+      if (!isValidUniversityEmail(email)) {
+        throw new Error(getEmailValidationError(email) || 'Invalid university email');
+      }
 
-      // const isUCalgaryEmail = email.endsWith('@ucalgary.ca') || email.endsWith('@uwaterloo.ca') || email.endsWith('.ca') || email.endsWith('.edu');
-
-      // if (isUCalgaryEmail) {
-      // For UCalgary emails, send magic link for passwordless sign in
+      // For valid university emails, send magic link for passwordless sign in
       const { data, error } = await supabase.auth.signInWithOtp({
         email,
         options: {
@@ -53,32 +50,6 @@ export const useEmailSignup = () => {
       });
 
       return { success: true, user: data?.user };
-      // } else {
-      //   // For non-UCalgary emails, just add to waitlist
-      //   const { error: waitlistError } = await supabase
-      //     .from('email_waitlist')
-      //     .insert(
-      //       {
-      //         email,
-      //       }
-      //     );
-
-      //   if (waitlistError) {
-      //     throw new Error('Failed to add to waitlist. Please try again.');
-      //   }
-
-      // console.log('Added to waitlist:', email);
-
-      // // Store the email in localStorage
-      // localStorage.setItem('waitlistEmail', email);
-      // setWaitlistEmail(email);
-
-      // toast("Thanks for your interest!", {
-      //   description: "We've added you to our waitlist. We'll notify you when we expand to your university!",
-      // });
-
-      // return { success: true, user: null };
-      // }
     } catch (error: any) {
       console.error('Email signup error:', error);
       toast("Error", {
