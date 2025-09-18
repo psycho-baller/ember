@@ -57,8 +57,6 @@ Here's how it works:
 2. I build a connection profile that reflects who you are and who you want to meet.
 3. Then I find someone on campus who matches that vibe and fits your schedule (a.k.a we'll try to match you with someone who's in your class, or who goes to the same lunch area as you)
 4. Once I find a match and you confirm that you're interested, I send them a warm intro message about you and ask them to reach out to you.
-
-P.S. I currently have a bug in my system. I'll get back to you in a few minutes once I'm fixed!
 `
       const secondMessage = `oh and also make sure you confirm your ${env.LOCATION_ID === "uofc" ? "ucalgary" : "uwaterloo"} email with the link I sent you`;
       // await twilioClient.messages.create({
