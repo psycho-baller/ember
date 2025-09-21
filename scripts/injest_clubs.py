@@ -39,7 +39,7 @@ def embed_batch(ai: OpenAI, texts: List[str]) -> List[List[float]]:
 
 def upsert_batch(sb: Client, rows: List[Dict]):
     # Upsert on URL to avoid duplicates
-    sb.table("clubs").upsert(rows, on_conflict="url").execute()
+    sb.table("uw_clubs").upsert(rows, on_conflict="url").execute()
 
 def main():
     if len(sys.argv) < 2:
