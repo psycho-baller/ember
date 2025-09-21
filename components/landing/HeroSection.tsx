@@ -50,8 +50,8 @@ const HeroSection = () => {
       await signUpWithEmail(email);
       // Show WhatsApp button immediately after successful university email submission
       setShowWhatsAppButton(true);
-    } catch (err: any) {
-      setError(err.message || 'Failed to process your request. Please try again.');
+    } catch (err: Error | unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to process your request. Please try again.');
       setShowWhatsAppButton(false);
     } finally {
       setIsSubmitted(false);
