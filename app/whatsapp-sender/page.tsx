@@ -62,11 +62,11 @@ Feel free to message me personally if you have any Qs 18257358670`
 
       // Handle both comma and semicolon separators
       const parts = line.split(/[,;]/).map(p => p.trim());
-      
+
       if (parts.length >= 2) {
         const name = parts[0].replace(/^["']|["']$/g, ''); // Remove quotes
         const number = parts[1].replace(/^["']|["']$/g, ''); // Remove quotes
-        
+
         if (name && number) {
           contacts.push({ name, number });
         }
@@ -114,7 +114,7 @@ Feel free to message me personally if you have any Qs 18257358670`
   const sendMessage = async (contact: Contact): Promise<{ success: boolean; messageSid?: string; error?: string }> => {
     try {
       const message = messageTemplate.replace(/{name}/g, contact.name);
-      
+
       const response = await fetch('/api/whatsapp/send', {
         method: 'POST',
         headers: {
@@ -134,9 +134,9 @@ Feel free to message me personally if you have any Qs 18257358670`
         return { success: false, error: data.error || 'Unknown error' };
       }
     } catch (error) {
-      return { 
-        success: false, 
-        error: error instanceof Error ? error.message : 'Network error' 
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Network error'
       };
     }
   };
@@ -197,7 +197,7 @@ Feel free to message me personally if you have any Qs 18257358670`
           <CardHeader>
             <CardTitle>1. Upload CSV File</CardTitle>
             <CardDescription>
-              CSV format: Name, Number (e.g., "John Doe, +1234567890")
+              CSV format: Name, Number (e.g., John Doe, +1234567890)
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -240,7 +240,7 @@ Feel free to message me personally if you have any Qs 18257358670`
             <CardHeader>
               <CardTitle>2. Customize Message Template</CardTitle>
               <CardDescription>
-                Use {'{name}'} to personalize with contact's name
+                Use {'{name}'} to personalize with contact&apos;s name
               </CardDescription>
             </CardHeader>
             <CardContent>
