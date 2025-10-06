@@ -72,7 +72,6 @@ Feel free to message me personally if you have any Qs 18257358670`
         }
       }
     }
-
     return contacts;
   };
 
