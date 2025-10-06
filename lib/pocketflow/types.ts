@@ -13,6 +13,10 @@ export interface SharedStore {
   suggestedEmail?: string;
   awaitingEmail?: boolean;
   messages: ModelMessage[];
+  // New fields for unauthenticated flow
+  isFirstMessage?: boolean;
+  hasRequestedEmail?: boolean;
+  sessionId?: string;
 }
 
 

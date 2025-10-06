@@ -4,7 +4,8 @@ import { SharedStore } from "./types";
 import { sendWhatsAppMessage } from "../twilio";
 import { openai } from "@ai-sdk/openai";
 import { emailRe, extractEmail, noRe, pickBestEmail, userInfo, yesRe } from "../utils";
-import { fetchCandidateEmails, getUserIdByEmail, linkPhoneToProfile } from "../supabase/queries";
+import { isValidUniversityEmail, getEmailValidationError } from "../email-utils";
+import { fetchCandidateEmails, getUserIdByEmail, linkPhoneToProfile, createUnauthenticatedSession, getUnauthenticatedSession, updateUnauthenticatedSession, linkSessionToUser } from "../supabase/queries";
 import { DEFAULT_SYSTEM_PROMPT, PERSONALIZED_SYSTEM_PROMPT } from "../prompts";
 import { clubRecommendationTool, extractUserInfoAndConnectionsTool, personRecommendationTool, sendWarmIntroTool } from "./tools";
 import { generateText, stepCountIs } from "ai";
@@ -27,6 +28,86 @@ const log = (
 
 const truncate = (s: string, max = 200) =>
   typeof s === "string" && s.length > max ? `${s.slice(0, max)}…` : s;
+
+// New node to handle first message and request email
+export class FirstMessageNode extends Node<SharedStore> {
+  async prep(shared: SharedStore): Promise<{
+    sessionExists: boolean;
+    isFirstMessage: boolean;
+    message: string;
+  }> {
+    const sessionId = shared.sessionId || shared.user?.phone || "";
+    const session = await getUnauthenticatedSession(sessionId);
+    const message = shared.incomingMessage || "";
+    
+    log("FirstMessageNode", "prep", {
+      sessionId,
+      sessionExists: !!session,
+      messagePreview: truncate(message, 120),
+      hasEmailRequested: !!session?.email_requested_at,
+    });
+    
+    return {
+      sessionExists: !!session,
+      isFirstMessage: !session || !session.email_requested_at,
+      message,
+    };
+  }
+
+  async exec({ sessionExists, isFirstMessage, message }: {
+    sessionExists: boolean;
+    isFirstMessage: boolean;
+    message: string;
+  }): Promise<"respond_and_ask_email" | "parse_email" | "chat"> {
+    log("FirstMessageNode", "exec", {
+      sessionExists,
+      isFirstMessage,
+      messagePreview: truncate(message, 120),
+    });
+
+    if (isFirstMessage) {
+      return "respond_and_ask_email";
+    } else if (emailRe.test(message) || yesRe.test(message)) {
+      return "parse_email";
+    } else {
+      return "chat";
+    }
+  }
+
+  async post(shared: SharedStore, _: unknown, action: "respond_and_ask_email" | "parse_email" | "chat"): Promise<string> {
+    log("FirstMessageNode", "post", { action });
+    
+    if (action === "respond_and_ask_email") {
+      const sessionId = shared.sessionId || shared.user?.phone || "";
+      const message = shared.incomingMessage || "";
+      
+      // Create or update session
+      try {
+        await createUnauthenticatedSession(sessionId, {
+          phoneNumber: shared.user?.phone,
+          firstName: shared.user?.firstName,
+          lastName: shared.user?.lastName,
+          profileName: `${shared.user?.firstName || ""} ${shared.user?.lastName || ""}`.trim(),
+          firstMessage: message,
+        });
+      } catch (error) {
+        // Session might already exist, update it
+        await updateUnauthenticatedSession(sessionId, {
+          emailRequestedAt: new Date().toISOString(),
+        });
+      }
+      
+      // Respond to their message and ask for email
+      shared.aiResponse = `Thanks for reaching out! I'd love to help you connect with people on campus. 
+
+To get started, I'll need to confirm your university email address. What's your email?`;
+      shared.hasRequestedEmail = true;
+      shared.awaitingEmail = true;
+    }
+    
+    return action;
+  }
+}
 
 export class CheckConfirmationNode extends Node<SharedStore> {
   async prep(shared: SharedStore): Promise<{
@@ -132,7 +213,7 @@ export class ParseEmailOrConfirmationNode extends Node<SharedStore> {
     return res;
   }
 
-  async exec({ msg, suggestion }: { msg: string; suggestion?: string }): Promise<{ action: "got_email" | "ask_again"; email?: string }> {
+  async exec({ msg, suggestion }: { msg: string; suggestion?: string }): Promise<{ action: "got_email" | "ask_again"; email?: string; validationError?: string }> {
     log("ParseEmailOrConfirmationNode", "exec:start", {
       msgPreview: truncate(msg, 160),
       suggestion,
@@ -140,10 +221,18 @@ export class ParseEmailOrConfirmationNode extends Node<SharedStore> {
       hasNo: noRe.test(msg),
       hasEmail: emailRe.test(msg),
     });
+    
     if (yesRe.test(msg) && suggestion) {
+      // Validate the suggested email with university-specific validation
+      const validationError = getEmailValidationError(suggestion);
+      if (validationError) {
+        log("ParseEmailOrConfirmationNode", "exec:decision", { action: "ask_again", source: "invalid_suggestion", validationError });
+        return { action: "ask_again", validationError };
+      }
       log("ParseEmailOrConfirmationNode", "exec:decision", { action: "got_email", source: "yes+suggestion" });
       return { action: "got_email", email: suggestion };
     }
+    
     if (noRe.test(msg)) {
       log("ParseEmailOrConfirmationNode", "exec:decision", { action: "ask_again", source: "no" });
       return { action: "ask_again" };
@@ -151,6 +240,12 @@ export class ParseEmailOrConfirmationNode extends Node<SharedStore> {
 
     const email = extractEmail(msg);
     if (email) {
+      // Validate extracted email with university-specific validation
+      const validationError = getEmailValidationError(email);
+      if (validationError) {
+        log("ParseEmailOrConfirmationNode", "exec:decision", { action: "ask_again", source: "invalid_email", validationError });
+        return { action: "ask_again", validationError };
+      }
       log("ParseEmailOrConfirmationNode", "exec:decision", { action: "got_email", source: "extracted", email });
       return { action: "got_email", email };
     }
@@ -159,7 +254,7 @@ export class ParseEmailOrConfirmationNode extends Node<SharedStore> {
     return { action: "ask_again" };
   }
 
-  async post(shared: SharedStore, _: unknown, res: { action: "got_email" | "ask_again"; email?: string }): Promise<string> {
+  async post(shared: SharedStore, _: unknown, res: { action: "got_email" | "ask_again"; email?: string; validationError?: string }): Promise<string> {
     log("ParseEmailOrConfirmationNode", "post:start", res);
     if (res.action === "got_email" && res.email) {
       shared.user.email = res.email;
@@ -167,10 +262,12 @@ export class ParseEmailOrConfirmationNode extends Node<SharedStore> {
       return "got_email";
     }
 
-    shared.aiResponse = `Please send a valid email address.`;
+    // Use specific validation error message if available
+    shared.aiResponse = res.validationError || `Please send a valid university email address.`;
     shared.awaitingEmail = true;
     log("ParseEmailOrConfirmationNode", "post:ask_again", {
       awaitingEmail: shared.awaitingEmail,
+      validationError: res.validationError,
       aiResponsePreview: truncate(shared.aiResponse || "", 160),
     });
     return "ask_again";
@@ -179,39 +276,42 @@ export class ParseEmailOrConfirmationNode extends Node<SharedStore> {
 
 // Verify email exists and link phone; then mark confirmation complete
 export class VerifyAndLinkNode extends Node<SharedStore> {
-  async prep(shared: SharedStore): Promise<{ email?: string; phone?: string }> {
-    const res = { email: shared.user?.email, phone: shared.user?.phone };
-    log("VerifyAndLinkNode", "prep", { email: res.email, phone: res.phone });
+  async prep(shared: SharedStore): Promise<{ email?: string; phone?: string; sessionId?: string }> {
+    const res = { 
+      email: shared.user?.email, 
+      phone: shared.user?.phone,
+      sessionId: shared.sessionId || shared.user?.phone || ""
+    };
+    log("VerifyAndLinkNode", "prep", { email: res.email, phone: res.phone, sessionId: res.sessionId });
     return res;
   }
 
-  async exec({ email, phone }: { email?: string; phone?: string }): Promise<{ ok: boolean; reason?: string }> {
-    log("VerifyAndLinkNode", "exec:start", { email, phone });
-    if (!email) {
+  async exec({ email, phone, sessionId }: { email?: string; phone?: string; sessionId?: string }): Promise<{ ok: boolean; reason?: string; userId?: string }> {
+    log("VerifyAndLinkNode", "exec:start", { email, phone, sessionId });
+    if (!email || !phone || !sessionId) {
       log("VerifyAndLinkNode", "exec:decision", { ok: false, reason: "missing" });
       return { ok: false, reason: "missing" };
     }
-    const id = await getUserIdByEmail(email);
-    log("VerifyAndLinkNode", "exec:lookup", { email, found: !!id });
-    if (!id) {
-      log("VerifyAndLinkNode", "exec:decision", { ok: false, reason: "not_found" });
-      return { ok: false, reason: "not_found" };
-    }
-    const userId = await linkPhoneToProfile(email, phone || "");
+
+    // Use the new linkSessionToUser function
+    const userId = await linkSessionToUser(sessionId, email, phone);
+    log("VerifyAndLinkNode", "exec:lookup", { email, phone, sessionId, userId });
+    
     if (!userId) {
       log("VerifyAndLinkNode", "exec:decision", { ok: false, reason: "not_found" });
       return { ok: false, reason: "not_found" };
     }
-    log("VerifyAndLinkNode", "exec:linked", { email, phone: phone || "" });
-    return { ok: true };
+    
+    log("VerifyAndLinkNode", "exec:linked", { email, phone, sessionId, userId });
+    return { ok: true, userId };
   }
 
-  async post(shared: SharedStore, _: unknown, res: { ok: boolean; reason?: string }): Promise<string> {
+  async post(shared: SharedStore, _: unknown, res: { ok: boolean; reason?: string; userId?: string }): Promise<string> {
     log("VerifyAndLinkNode", "post:start", res);
     if (res.ok) {
       shared.confirmationCompleted = true;
       shared.awaitingEmail = false;
-      sendWhatsAppMessage(shared.user.phone!, "Your account has been successfully linked. We can now chat or call!");
+      shared.aiResponse = "Perfect! Your account has been successfully linked. Now, what can I help you with? I can help you find friends, clubs, study groups, or even potential dates on campus!";
       log("VerifyAndLinkNode", "post:confirmed", {
         confirmationCompleted: shared.confirmationCompleted,
         awaitingEmail: shared.awaitingEmail,
@@ -221,9 +321,9 @@ export class VerifyAndLinkNode extends Node<SharedStore> {
     }
 
     if (res.reason === "not_found") {
-      sendWhatsAppMessage(shared.user.phone!, `That email is not recognized. Send a different email.`);
+      shared.aiResponse = `That email is not recognized in our system. Please make sure you're using your university email address and try again.`;
     } else {
-      sendWhatsAppMessage(shared.user.phone!, `Please provide your email address to continue.`);
+      shared.aiResponse = `Please provide your university email address to continue.`;
     }
     shared.awaitingEmail = true;
     log("VerifyAndLinkNode", "post:ask_again", {
