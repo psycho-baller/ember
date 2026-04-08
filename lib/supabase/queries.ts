@@ -16,6 +16,26 @@ export async function fetchCandidateEmails(firstName: string): Promise<string[]>
   return (data ?? []).map((r: { email: string }) => r.email);
 }
 
+/**
+ * Fetch candidate emails filtered by university and excluding accounts with phone numbers
+ */
+export async function fetchAvailableCandidateEmails(firstName: string): Promise<string[]> {
+  const supabase = await createClient();
+
+  // Determine university domain based on current location
+  const universityDomain = env.LOCATION_ID === "uofc" ? "@ucalgary.ca" : "@uwaterloo.ca";
+
+  const { data, error } = await supabase.rpc('search_available_emails_by_first', {
+    prefix: firstName,
+    university_domain: universityDomain,
+    limit_count: 5
+  });
+
+  console.log('Available candidate emails:', data, error);
+  if (error) throw error;
+  return (data ?? []).map((r: { email: string }) => r.email);
+}
+
 export async function getUserIdByEmail(email: string): Promise<string | null> {
   const supabase = await createClient();
   // mock emails for testing
@@ -69,6 +89,254 @@ export async function linkPhoneToProfile(email: string, phone: string): Promise<
   const { data, error } = await supabase.from('profiles').update({ phone_number: phone }).eq('id', userId).select("id").single()
   if (error) throw error;
   return data.id;
+}
+
+/**
+ * Determine which university an email belongs to
+ */
+export function getUniversityFromEmail(email: string): "uofc" | "uw" | "unknown" {
+  if (email.endsWith("@ucalgary.ca")) return "uofc";
+  if (email.endsWith("@uwaterloo.ca")) return "uw";
+  return "unknown";
+}
+
+/**
+ * Extract first name from email based on university format
+ */
+export function extractFirstNameFromEmail(email: string): string | null {
+  const university = getUniversityFromEmail(email);
+  const username = email.split('@')[0];
+
+  if (university === "uofc") {
+    // University of Calgary: firstname.lastname@ucalgary.ca
+    const parts = username.split('.');
+    return parts.length > 0 ? parts[0] : null;
+  } else if (university === "uw") {
+    // University of Waterloo: flastname@uwaterloo.ca (first letter + lastname)
+    return username.length > 0 ? username[0] : null;
+  }
+
+  return null;
+}
+
+/**
+ * Generate possible email formats for a given first and last name
+ */
+export function generatePossibleEmails(firstName: string, lastName: string, university: "uofc" | "uw"): string[] {
+  const emails: string[] = [];
+
+  if (university === "uofc") {
+    // University of Calgary format: firstname.lastname@ucalgary.ca
+    emails.push(`${firstName.toLowerCase()}.${lastName.toLowerCase()}@ucalgary.ca`);
+  } else if (university === "uw") {
+    // University of Waterloo format: flastname@uwaterloo.ca
+    emails.push(`${firstName[0].toLowerCase()}${lastName.toLowerCase()}@uwaterloo.ca`);
+  }
+
+  return emails;
+}
+
+/**
+ * Check if a first name matches an email based on university format
+ */
+export function doesFirstNameMatchEmail(firstName: string, email: string): boolean {
+  const university = getUniversityFromEmail(email);
+  const username = email.split('@')[0];
+
+  if (university === "uofc") {
+    // University of Calgary: firstname.lastname@ucalgary.ca
+    const emailFirstName = username.split('.')[0];
+    return emailFirstName.toLowerCase() === firstName.toLowerCase();
+  } else if (university === "uw") {
+    // University of Waterloo: flastname@uwaterloo.ca
+    const firstLetter = username[0];
+    return firstLetter.toLowerCase() === firstName[0].toLowerCase();
+  }
+
+  return false;
+}
+
+/**
+ * Check if an email is from the current university context
+ */
+export function isFromCurrentUniversity(email: string): boolean {
+  const emailUniversity = getUniversityFromEmail(email);
+  return emailUniversity === env.LOCATION_ID;
+}
+
+/**
+ * Check if a profile has a phone number linked
+ */
+export async function hasPhoneNumber(email: string): Promise<boolean> {
+  const phoneNumber = await getPhoneNumberByEmail(email);
+  return phoneNumber !== null && phoneNumber.trim() !== "";
+}
+
+/**
+ * Find available emails (no phone number) from the same university as the current context
+ * This is the optimized version using the database function
+ */
+export async function findAvailableUniversityEmails(firstName: string): Promise<string[]> {
+  return await fetchAvailableCandidateEmails(firstName);
+}
+
+/**
+ * Find available emails (no phone number) from the same university as the current context
+ * This is the fallback version using JavaScript filtering with university-specific email format matching
+ */
+export async function findAvailableUniversityEmailsJS(firstName: string): Promise<string[]> {
+  // First get all candidate emails
+  const candidateEmails = await fetchCandidateEmails(firstName);
+
+  // Filter by university, email format, and phone number availability
+  const availableEmails: string[] = [];
+
+  for (const email of candidateEmails) {
+    // Check if email is from current university
+    if (!isFromCurrentUniversity(email)) {
+      console.log(`Skipping ${email} - not from current university (${env.LOCATION_ID})`);
+      continue;
+    }
+
+    // Check if first name matches email format for the university
+    if (!doesFirstNameMatchEmail(firstName, email)) {
+      console.log(`Skipping ${email} - first name doesn't match university email format`);
+      continue;
+    }
+
+    // Check if email already has a phone number
+    const hasPhone = await hasPhoneNumber(email);
+    if (hasPhone) {
+      console.log(`Skipping ${email} - already has phone number`);
+      continue;
+    }
+
+    availableEmails.push(email);
+  }
+
+  return availableEmails;
+}
+
+/**
+ * Get detailed information about a user including university and phone status
+ */
+export async function getUserUniversityStatus(email: string): Promise<{
+  email: string;
+  university: "uofc" | "uw" | "unknown";
+  hasPhone: boolean;
+  fullName: string;
+} | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc('get_user_university_status', {
+    user_email: email
+  });
+
+  if (error || !data || data.length === 0) {
+    console.log('No user found for email:', email, error);
+    return null;
+  }
+
+  const user = data[0];
+  return {
+    email: user.email,
+    university: user.university as "uofc" | "uw" | "unknown",
+    hasPhone: user.has_phone,
+    fullName: user.full_name
+  };
+}
+
+/**
+ * Find and suggest available emails based on first and last name
+ */
+export async function suggestAvailableEmails(firstName: string, lastName?: string): Promise<{
+  exactMatches: string[];
+  suggestions: string[];
+  university: "uofc" | "uw";
+}> {
+  const university = env.LOCATION_ID as "uofc" | "uw";
+
+  // Get emails that match the first name pattern
+  const firstNameMatches = await findAvailableUniversityEmails(firstName);
+
+  const result = {
+    exactMatches: firstNameMatches,
+    suggestions: [] as string[],
+    university
+  };
+
+  // If we have a last name, generate possible email formats
+  if (lastName) {
+    const possibleEmails = generatePossibleEmails(firstName, lastName, university);
+
+    // Check which of the generated emails exist and are available
+    for (const email of possibleEmails) {
+      const userStatus = await getUserUniversityStatus(email);
+      if (userStatus && !userStatus.hasPhone) {
+        result.suggestions.push(email);
+      }
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Comprehensive function to handle email confirmation and phone linking
+ * This validates university, checks availability, and links the phone number
+ */
+export async function confirmEmailAndLinkPhone(
+  email: string,
+  phoneNumber: string
+): Promise<{
+  success: boolean;
+  message: string;
+  userId?: string;
+  university?: "uofc" | "uw" | "unknown";
+}> {
+  try {
+    // 1. Get user status
+    const userStatus = await getUserUniversityStatus(email);
+
+    if (!userStatus) {
+      return {
+        success: false,
+        message: "Email not found in our system"
+      };
+    }
+
+    // 2. Check if email is from correct university
+    if (userStatus.university !== env.LOCATION_ID) {
+      return {
+        success: false,
+        message: `This email is from ${userStatus.university === "uofc" ? "University of Calgary" : userStatus.university === "uw" ? "University of Waterloo" : "an unknown university"}, but you're trying to connect from ${env.LOCATION_ID === "uofc" ? "University of Calgary" : "University of Waterloo"}`
+      };
+    }
+
+    // 3. Check if email already has a phone number
+    if (userStatus.hasPhone) {
+      return {
+        success: false,
+        message: "This email already has a phone number connected to it. Please use a different email or contact support."
+      };
+    }
+
+    // 4. Link the phone number
+    const userId = await linkPhoneToProfile(email, phoneNumber);
+
+    return {
+      success: true,
+      message: "Successfully linked phone number to email",
+      userId,
+      university: userStatus.university
+    };
+
+  } catch (error) {
+    console.error('Error confirming email and linking phone:', error);
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : "An unexpected error occurred"
+    };
+  }
 }
 
 
