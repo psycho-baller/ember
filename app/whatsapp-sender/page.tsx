@@ -30,13 +30,13 @@ Thanks for your interest in joining Exo. Over the past few weeks I've been deepl
 
 Questiontration:
 - questiontration.vercel.app
-- https://github.com/psycho-baller/questiontration
+- https://github.com/rami-maalouf/questiontration
 - It aims to make it easier to connect with your friends through games
 
 LinkMaxxing
 - linkmaxxing.vercel.app
 - devpost.com/software/linkmaxxing
-- https://github.com/psycho-baller/linkmaxxing
+- https://github.com/rami-maalouf/linkmaxxing
 - discover what connects you with others while mastering the art of communication
 
 I demo the 2 apps in https://youtu.be/YM9n5OxhGO8
