@@ -195,3 +195,87 @@ export async function checkIfIntroExists(from_email: string, to_email: string): 
   if (error) return false;
   return true;
 }
+
+// New functions for unauthenticated sessions
+export async function createUnauthenticatedSession(sessionId: string, data: {
+  phoneNumber?: string;
+  firstName?: string;
+  lastName?: string;
+  profileName?: string;
+  firstMessage: string;
+}) {
+  const supabase = await createClient();
+  const { data: result, error } = await supabase
+    .from('unauthenticated_sessions')
+    .insert({
+      session_id: sessionId,
+      phone_number: data.phoneNumber,
+      first_name: data.firstName,
+      last_name: data.lastName,
+      profile_name: data.profileName,
+      first_message: data.firstMessage,
+    })
+    .select()
+    .single();
+  
+  if (error) throw error;
+  return result;
+}
+
+export async function getUnauthenticatedSession(sessionId: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('unauthenticated_sessions')
+    .select('*')
+    .eq('session_id', sessionId)
+    .single();
+  
+  if (error) return null;
+  return data;
+}
+
+export async function updateUnauthenticatedSession(sessionId: string, updates: {
+  emailRequestedAt?: string;
+  emailConfirmedAt?: string;
+  confirmedEmail?: string;
+  linkedUserId?: string;
+}) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('unauthenticated_sessions')
+    .update(updates)
+    .eq('session_id', sessionId)
+    .select()
+    .single();
+  
+  if (error) throw error;
+  return data;
+}
+
+export async function linkSessionToUser(sessionId: string, email: string, phoneNumber: string): Promise<string | null> {
+  const supabase = await createClient();
+  
+  // First check if user exists
+  const userId = await getUserIdByEmail(email);
+  if (!userId) return null;
+  
+  // Update user with phone number and session ID
+  const { error: userError } = await supabase
+    .from('users')
+    .update({ 
+      phone_number: phoneNumber,
+      session_id: sessionId 
+    })
+    .eq('id', userId);
+  
+  if (userError) throw userError;
+  
+  // Update the unauthenticated session
+  await updateUnauthenticatedSession(sessionId, {
+    emailConfirmedAt: new Date().toISOString(),
+    confirmedEmail: email,
+    linkedUserId: userId
+  });
+  
+  return userId;
+}

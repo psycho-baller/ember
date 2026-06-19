@@ -1,6 +1,6 @@
 import { Flow } from "pocketflow";
 import { loadSharedStore, saveSharedStore } from "../supabase/queries";
-import { CheckConfirmationNode, AskForEmailNode, ParseEmailOrConfirmationNode, VerifyAndLinkNode, ChatNode } from "./nodes";
+import { FirstMessageNode, CheckConfirmationNode, AskForEmailNode, ParseEmailOrConfirmationNode, VerifyAndLinkNode, ChatNode } from "./nodes";
 import { SharedStore } from "./types";
 import { sendWhatsAppMessage } from "../twilio";
 import { addMessageToGlobalGraph, addUserMessage } from "../zep/client";
@@ -16,24 +16,29 @@ import { addMessageToGlobalGraph, addUserMessage } from "../zep/client";
 
 
 export function createConfirmThenChatFlow(): Flow<SharedStore> {
+  const firstMessage = new FirstMessageNode();
   const check = new CheckConfirmationNode();
   const ask = new AskForEmailNode();
   const parse = new ParseEmailOrConfirmationNode();
   const verify = new VerifyAndLinkNode();
   const chat = new ChatNode();
 
-  // wiring
+  // New wiring: start with FirstMessageNode
+  firstMessage
+    .on("respond_and_ask_email", ask)
+    .on("parse_email", parse)
+    .on("chat", chat);
+
+  // Original wiring for email confirmation flow
   check
     .on("confirmed", chat)
     .on("parse", parse)
     .on("ask", ask);
 
-
   parse.on("got_email", verify).on("ask_again", ask);
   verify.on("confirmed", chat).on("ask_again", ask);
 
-
-  return new Flow<SharedStore>(check);
+  return new Flow<SharedStore>(firstMessage);
 }
 
 
@@ -57,6 +62,7 @@ export async function runSessionedFlow(args: {
 
   // Normalize and set inputs
   shared.user.phone = fromPhone.replace(/^whatsapp:/, "");
+  shared.sessionId = sessionId;
   if (!shared.user.firstName && profileName) {
     shared.user.firstName = profileName.split(" ")[0];
     shared.user.lastName = profileName.split(" ")[1];
